@@ -1,4 +1,4 @@
-# Basys-MX3-library
+# Basys MX3 Library Pack
 
 BasysMX3 incorporates a wide range of modules. Digilent provides a set of libraries, allowing user 
 easy access to each module’s functionality.
