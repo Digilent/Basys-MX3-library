@@ -52,8 +52,7 @@ int main(int argc, char** argv)
 **		
 **
 **	Description:
-**		This function initializes the IO basic pins and calls specific functions from the following libs: LED, SWT, BTN, LCD, RGBLed
-**      The Init functions for each module are called and bit and group specific functions are used
+**		This function initializes the Analon Input control module and uses the ADC and AIC functions to read an analog pin
 **          
 */
 AICDemo(){
