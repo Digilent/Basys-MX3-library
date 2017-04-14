@@ -37,7 +37,7 @@ The usage of each library is documented in the library's .c and .h file. An over
 
 ## Demos
 
-Demos that use each of the libraries are found in the Demos folder. They are provided as MPLAB X projects. These demos are currently under construction and are not available for all libraries.
+Demos that use each of the libraries are found in the Demos folder. They are provided as MPLAB X projects. 
 
 ## Known Issues
 
