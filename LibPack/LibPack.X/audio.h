@@ -5,13 +5,12 @@
     Digilent
 
   @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
+    audio.h
 
   @Description
-    Describe the purpose of this file.
+    This file groups the declarations of the functions that implement
+    the Audio module (defined in audio.c). 
+    Include the file in the project when the Audio library is needed.
  */
 /* ************************************************************************** */
 
@@ -26,7 +25,7 @@ void AUDIO_Close();
 void AUDIO_InitPlayBack(unsigned short *pPlay_Samples1, int cntBuf1);
 void AUDIO_InitRecord(unsigned short *pPlay_Samples1, int cntBuf1);
 
-unsigned char GetAudioMode();
+unsigned char AUDIO_GetAudioMode();
 
 
 #endif /* _AUDIO_H */

@@ -10,8 +10,9 @@
   @Description
         This file groups the functions that implement the ADC module.
         The ADC module implements basic ADC (analog to Digital converter) functionality.
-        This module is used by AIC and MIC libraries.
-        Include this file in the project when the AIC and MIC libraries are needed.
+        This library is used by AIC and MIC libraries, and can be used stand alone 
+        for reading any analog input pin.
+        Include adc.c in the project when ADC is used standalone, or when the AIC and MIC libraries are needed.
  
   @Author
     Cristian Fatu 
@@ -29,8 +30,7 @@
 #include "adc.h"
 
 /* ************************************************************************** */
-
-/***	ADC_ConfigureAnalogInputManual
+/***	ADC_Init()
 **
 **	Parameters:
 **		
@@ -43,32 +43,29 @@
 **      in manual sampling mode.
 **          
 */
-void ADC_ConfigureAnalogInputManual()
+void ADC_Init()
 {
 
 	AD1CON1	=	0; 
     AD1CON1bits.SSRC = 7;   // Internal counter ends sampling and starts conversion (auto convert)
     AD1CON1bits.FORM = 0;   // Integer 16-bit
-	/* Set up for manual sampling
-	*/
+	// Setup for manual sampling
 	AD1CSSL	=	0;
-	AD1CON3	=	0x0002;	//Tad = internal 6 Tpb
+	AD1CON3	=	0x0002;     // ADC Conversion Clock Select bits: TAD = 6 TPB
 	AD1CON2	=	0;
-    AD1CON2bits.VCFG = 0;   // VREFH = AVDD / VREFL = AVss
-
-	/* Turn on ADC
-	*/
+    AD1CON2bits.VCFG = 0;   // Voltage Reference Configuration bits: VREFH = AVDD and VREFL = AVSS
+	// Turn on ADC
     AD1CON1bits.ON = 1;
 } 
 
-
+/* ************************************************************************** */
 /***	ADC_AnalogRead
 **
 **	Parameters:
 **		unsigned char analogPIN - the number of the analog pin that must be read
 **
 **	Return Value:
-**		
+**		- the 16 LSB bits contain the result of analog to digital conversion of the analog value of the specified pin
 **
 **	Description:
 **		This function returns the digital value corresponding to the analog pin, 
@@ -84,10 +81,9 @@ unsigned int ADC_AnalogRead(unsigned char analogPIN)
  
     AD1CON1bits.SAMP = 1;           // Begin sampling
     while( AD1CON1bits.SAMP );      // wait until acquisition is done
-    while( ! AD1CON1bits.DONE );    // wait until conversion done
+    while( ! AD1CON1bits.DONE );    // wait until conversion is done
  
     adc_val = ADC1BUF0;
-    
     IEC0bits.T2IE = 1;
     return adc_val;
 }

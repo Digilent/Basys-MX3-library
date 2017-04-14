@@ -5,13 +5,13 @@
     Digilent
 
   @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
+    rgbled.h
 
   @Description
-    Describe the purpose of this file.
+    This file groups the declarations of the functions that implement
+        the RGBLed library (defined in rgbled.c).
+        Include the file in the project when this library is needed.
+        Use #include "rgbled.h" in the source files where the functions are needed.
  */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ void RGBLED_Close();
 
 //private functions:
 void RGBLED_ConfigurePins();
-void Timer5Setup();
+void RGBLED_Timer5Setup();
 
 #endif /* _RGBLED_H */
 

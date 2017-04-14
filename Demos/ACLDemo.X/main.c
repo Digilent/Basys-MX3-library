@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 **      The X, Y and Z axes values are then displayed on the LCD
 **          
 */
-ACLDemo(){
+void ACLDemo(){
     float rgACLGVals[3];  
     char strMsg[80];    
     unsigned int baseCnt = 0;

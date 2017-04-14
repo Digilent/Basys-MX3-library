@@ -47,11 +47,11 @@ char rgchRx[cchRxMax];
 **      flags the success using the fRxDone global variable and then ignores the received bytes.
 **          
 */
-void __ISR(_UART_4_VECTOR, ipl7) Uart4Handler (void)
+void __ISR(_UART_4_VECTOR, ipl6) Uart4Handler (void)
 {
 	unsigned char bVal;
 	
-	//Read the Uart4 rx buffer while data is available
+	//Read the Uart4 RX buffer while data is available
 	while(U4STAbits.URXDA)
 	{
 		bVal = (unsigned char)U4RXREG;
@@ -62,28 +62,24 @@ void __ISR(_UART_4_VECTOR, ipl7) Uart4Handler (void)
 	        if (cchRxMax > ichRx)
 	        {
 	            // Yes.
-	    
                 rgchRx[ichRx] = bVal;
 	
 	            // Is this the last character of the command?
 	            if(('\n' == rgchRx[ichRx] ) && ('\r' == rgchRx[ichRx-1]))
 	            {
 	                // Yes.
-	
 	                fRxDone = 1;
-	            }   // end if
-	
+	            }   
 	            ichRx++;
-	        }   // end if
+	        }  
 	        else
 	        {
-	            // No we don't have space to store anymore characters.
-	            // Mark the command as complete.
-	
+	            // No, we don't have space to store anymore characters.
+	            // Mark the command as complete
 	            fRxDone = 1;
-	        }   // end else
-    	}  	// end if
-	}  // end while	
+	        }   
+    	}  	
+	}  
 	//Clear the Uart4 interrupt flag.
 	IFS2bits.U4RXIF = 0;
 }
@@ -99,11 +95,11 @@ void __ISR(_UART_4_VECTOR, ipl7) Uart4Handler (void)
 **
 **	Description:
 **		This function initializes the hardware involved in the UART module, in 
-**      the UART receive with interrupts mode.
-**      The following digital pins are configured as digital outputs: UART_TX
-**      The following digital pins are configured as digital inputs: UART_RX.
+**      the UART receive with interrupt mode.
+**      The UART_TX digital pin is configured as digital output.
+**      The UART_RX digital pin is configured as digital input.
 **      The UART_TX and UART_RX are mapped over the UART4 interface.
-**      The UART4 module of PIC32 is configured to work at the specified baud.
+**      The UART4 module of PIC32 is configured to work at the specified baud, no parity and 1 stop bit.
 **      
 **          
 */
@@ -125,10 +121,10 @@ void UART_Init(unsigned int baud)
 **	Description:
 **		This function initializes the hardware involved in the UART module, in 
 **      the UART receive without interrupts (polling method).
-**      The following digital pins are configured as digital outputs: UART_TX
-**      The following digital pins are configured as digital inputs: UART_RX.
+**      The UART_TX digital pin is configured as digital output.
+**      The UART_RX digital pin is configured as digital input.
 **      The UART_TX and UART_RX are mapped over the UART4 interface.
-**      The UART4 module of PIC32 is configured to work at the specified baud.
+**      The UART4 module of PIC32 is configured to work at the specified baud, no parity and 1 stop bit.
 **      
 **          
 */
@@ -149,8 +145,9 @@ void UART_InitPoll(unsigned int baud)
 **
 **	Description:
 **		This function configures the UART4 hardware interface of PIC32, according 
-**      to the provided baud rate, with no interrupts
+**      to the provided baud rate, no parity and 1 stop bit, with no interrupts.
 **      In order to compute the baud rate value, it uses the peripheral bus frequency definition (PB_FRQ, located in config.h)
+**      This is a low-level function called by initialization functions, so user should avoid calling it directly.   
 **      
 **          
 */
@@ -192,25 +189,25 @@ void UART_ConfigureUart(unsigned int baud)
 **
 **	Description:
 **		This function configures the UART4 hardware interface of PIC32, according 
-**      to the provided baud rate (by calling the UART_ConfigureUart function)
+**      to the provided baud rate, no parity and 1 stop bit (by calling the UART_ConfigureUart function)
 **      and additionally configures the interrupt on RX.
+**      This is a low-level function called by initialization functions, so user should avoid calling it directly.   
 **      
 **          
 */
 void UART_ConfigureUartRXInt(unsigned int baud)
 {
-    INTDisableInterrupts();             // disable interrupts 
 
     UART_ConfigureUart(baud);
 
-    IPC9bits.U4IP = 7;
+    IPC9bits.U4IP = 6;
     IPC9bits.U4IS = 3;
 
 	IFS2bits.U4RXIF = 0;    //Clear the Uart4 interrupt flag.
-    IEC2bits.U4RXIE = 1; // enable rx interrupt
+    IEC2bits.U4RXIE = 1;    // enable RX interrupt
     
 
-    INTEnableSystemMultiVectoredInt();  // enable interrupts 
+    macro_enable_interrupts();  // enable interrupts 
 }
 
 /***	UART_ConfigurePins
@@ -222,12 +219,12 @@ void UART_ConfigureUartRXInt(unsigned int baud)
 **		
 **
 **	Description:
-**		This function configures the digital pins involved in the SPIFLASH module: 
-**      The following digital pins are configured as digital outputs: UART_TX
-**      The following digital pins are configured as digital inputs: UART_RX.
+**		This function configures the digital pins involved in the UART module: 
+**      The UART_TX digital pin is configured as digital output.
+**      The UART_RX digital pin is configured as digital input.
 **      The UART_TX and UART_RX are mapped over the UART4 interface.
 **      The function uses pin related definitions from config.h file.
-**      
+**      This is a low-level function called by UART_Init(), so user should avoid calling it directly.   
 **          
 */
 void UART_ConfigurePins()
@@ -270,7 +267,7 @@ void UART_PutChar(char ch)
 **		
 **
 **	Description:
-**		This function transmits all the characters from a zero terminated string over UART4. 
+**		This function transmits all the characters from a zero terminated string over UART4. The terminator character is not sent.
 **      
 **          
 */
@@ -333,20 +330,19 @@ unsigned char UART_GetCharPoll()
 /***	UART_GetStringPoll
 **
 **	Parameters:
-**          - unsigned char *pText - Pointer to a buffer storing the received bytes.
+**          - unsigned char *pText - Pointer to a buffer to store the received bytes.
 **          
 **
 **	Return Value:
 **          unsigned char  receive status
-**              1 if at least one received byte is available
+**              1 if at least one received byte is available, the received characters are placed in pText buffer
 **              0 if no received bytes are available 
 **
 **	Description:
-**		This function returns a zero terminated string to be received over UART4, 
-**      using polling method.
-**      If a received byte is available, this function calls repeatedly UART_GetCharPoll 
-**      until a zero value is received over UART4.
-**          
+**		This function returns a zero terminated string received over UART4, using polling method.    
+**      While a received bytes is available, this function calls repeatedly UART_GetCharPoll 
+**      until no values are received over UART4.
+**      It returns 0 if no received bytes are available, and returns 1 if at least one byte was received.
 */
 unsigned char UART_GetStringPoll(unsigned char *pText)
 {
@@ -365,17 +361,16 @@ unsigned char UART_GetStringPoll(unsigned char *pText)
 /***	UART_GetString
 **
 **	Parameters:
-**		pchBuff - pointer to a char buffer to hold the received sz
-**		cchBuff - size of the buffer to hold the sz
+**		char* pchBuff - pointer to a char buffer to hold the received zero terminated string 
+**		int cchBuff - size of the buffer to hold the zero terminated string
 **          
 **
 **	Return Value:
 **          unsigned char  receive status
-**                  > 0 - the number of characters contained in the command
-**                  0	- a command hasn't been received
-**                  -1	- a buffer overrun occurred
+**                  > 0 - the number of characters contained in the string
+**                  0	- a CR+LF terminated string hasn't been received
 **                  -2	- a buffer underrun occurred (user buffer not large enough)
-**                  -3	- an invalid (0 char count) command was received  
+**                  -3	- an invalid (0 char count) CR+LF terminated string was received  
 **
 **	Description:
 **		This function returns a zero terminated string to be received over UART4,  
@@ -391,46 +386,30 @@ unsigned char UART_GetString( char* pchBuff, int cchBuff )
 {
 	unsigned char ich;
 	
-	// Have we finished receiving a command via UART4?
+	// Have we finished receiving a CR+LF terminated string via UART4?
 	if(!fRxDone)
 	{
 		return 0;
 	}
-	
-	// Did a buffer overrun occur?
-	if((cchRxMax == ichRx) && (('\r' != rgchRx[ichRx-2]) || ( '\n' != rgchRx[ichRx-1] )))
-	{
-		// A buffer overrun occured.
-		
-		INTDisableInterrupts();
-		fRxDone = 0;
-		ichRx = 0;
-		INTEnableInterrupts();
-		
-		return -1;
-	}
-	
-	// Does the user buffer contain enough space to hold the command?
+	// Does the user buffer have enough space to store the CR+LF terminated string?
 	if(cchBuff < ichRx - 1)
 	{
 		// A buffer underrun occured.
-		INTDisableInterrupts();
+		macro_disable_interrupts;
 		fRxDone = 0;
 		ichRx = 0;
-		INTEnableInterrupts();
+		macro_enable_interrupts();
 		
 		return -2;
 	}
-	
-	// Was a 0 character command received?
+    // Was a 0 character CR+LF terminated string received?
 	if(2 == ichRx )
 	{
-		// A zero character length command was received.
-		INTDisableInterrupts();
+		// A zero character length CR+LF terminated string was received.
+		macro_disable_interrupts;
 		fRxDone = 0;
 		ichRx = 0;
-		INTEnableInterrupts();
-		
+		macro_enable_interrupts();
 		return -3;
 	}
 	
@@ -442,14 +421,12 @@ unsigned char UART_GetString( char* pchBuff, int cchBuff )
 	}
 	*pchBuff = '\0';
 	
-	INTDisableInterrupts();
+	macro_disable_interrupts;
 	fRxDone = 0;
 	ichRx = 0;
-	INTEnableInterrupts();
-	
+	macro_enable_interrupts();
 	return ich;
 }
-
 /***	UART_Close
 **
 **	Parameters:

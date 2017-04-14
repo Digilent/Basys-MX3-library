@@ -9,9 +9,11 @@
 
   @Description
         This file groups the functions that implement the AIC (analog input 
-        control library). The library is used to handle analog input control on 
-        thumbwheel potentiometer or analog input connectors labeled AIC. 
-        It relies on the ADC module. 
+        control library). 
+        The library is used to handle analog input control on thumbwheel potentiometer 
+        or analog input connectors labeled AIC. 
+        The analog value is converted to digital value using 10 bits analog to digital 
+        conversion implemented in ADC library. 
         Include the file as well as adc.c and adc.h in the project when this 
         library is needed.	
  
@@ -52,7 +54,7 @@
 void AIC_Init()
 {
     AIC_ConfigurePins();
-    ADC_ConfigureAnalogInputManual();
+    ADC_Init();
 }
 
 /* ------------------------------------------------------------ */
@@ -65,16 +67,15 @@ void AIC_Init()
 **		
 **
 **	Description:
-**		This function configures the pins involved in the AIC module: 
-**      The following pins are configured as analog input: ADC_AN2.
+**		This function configures the ADC_AN2 pin as analog input.
 **      The function uses pin related definitions from config.h file.
+**      This is a low-level function called by AIC_Init(), so user should avoid calling it directly.
 **      
 **          
 */
 void AIC_ConfigurePins()
 {
     // Configure AIC signal as analog input
-    
     tris_ADC_AN2 = 1;     // set AN2 (RB2) as analog input pin 
     ansel_ADC_AN2 = 1;   // enable analog (set pins as analog)
 }
@@ -86,7 +87,7 @@ void AIC_ConfigurePins()
 **		
 **
 **	Return Value:
-**		unsigned int    - the result of analog to digital conversion of AIC value
+**		unsigned int    - the 16 LSB bits contain the result of analog to digital conversion of AIC value
 **
 **	Description:
 **		This function returns the digital value corresponding to the AIC analog 

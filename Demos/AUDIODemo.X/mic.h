@@ -4,7 +4,7 @@
     Digilent
 
   @File Name
-    mmic.h
+    mic.h
 
   @Description
         This file groups the declarations of the functions that implement

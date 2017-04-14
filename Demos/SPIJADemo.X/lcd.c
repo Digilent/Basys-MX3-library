@@ -9,9 +9,9 @@
 
   @Description
         This file groups the functions that implement the LCD library.
-        The library implements control of LCD device. 
+        The library implements control of the LCD device. 
         It is accessed in a "parallel like" approach. 
- *      Library provides functions for simple commands, displaying characters, handling user characters.
+        Library provides functions for simple commands, displaying characters, handling user characters.
         Include the file together with config.h, utils.c and utils.h in the project when this library is needed.	
  
   @Author
@@ -41,10 +41,10 @@
 **		
 **
 **	Description:
-**		This function initializes the hardware involved in the LCD module: 
+**		This function initializes the hardware used in the LCD module: 
 **      The following digital pins are configured as digital outputs: LCD_DISP_RS, LCD_DISP_RW, LCD_DISP_EN
 **      The following digital pins are configured as digital inputs: LCD_DISP_RS.
-**      After initialization, the LCD is turned on.
+**      The LCD initialization sequence is performed, the LCD is turned on.
 **          
 */
 void LCD_Init()
@@ -63,10 +63,11 @@ void LCD_Init()
 **		
 **
 **	Description:
-**		This function configures the digital pins involved in the SPIFLASH module: 
+**		This function configures the digital pins involved in the LCD module: 
 **      The following digital pins are configured as digital outputs: LCD_DISP_RS, LCD_DISP_RW, LCD_DISP_EN
 **      The following digital pins are configured as digital inputs: LCD_DISP_RS.
 **      The function uses pin related definitions from config.h file.
+**      This is a low-level function called by LCD_Init(), so user should avoid calling it directly.
 **      
 **          
 */
@@ -85,8 +86,6 @@ void LCD_ConfigurePins()
     rp_LCD_DISP_RW = 0;
     rp_LCD_DISP_EN = 0;
     
-    // data pins will be set as output or input in the corresponding write and read functions
-    
     // make data pins digital (disable analog)
     ansel_LCD_DB2 = 0;
     ansel_LCD_DB4 = 0;
@@ -99,17 +98,18 @@ void LCD_ConfigurePins()
 /***	LCD_WriteByte
 **
 **	Parameters:
-**		unsigned char bData - the data to be written to LCD
+**		unsigned char bData - the data to be written to LCD, over the parallel interface
 **
 **	Return Value:
 **		
 **
 **	Description:
-**		This function writes a byte tot he LCD. 
+**		This function writes a byte to the LCD. 
 **      It implements the parallel write using LCD_DISP_RS, LCD_DISP_RW, LCD_DISP_EN, 
 **      LCD_DISP_RS pins, and data pins. 
 **      For a better performance, the data pins are accessed using a pointer to 
 **      the register byte where they are allocated.
+**      This is a low-level function called by LCD write functions, so user should avoid calling it directly.
 **      The function uses pin related definitions from config.h file.
 **      
 **          
@@ -123,17 +123,17 @@ void LCD_WriteByte(unsigned char bData)
 	// clear RW
 	lat_LCD_DISP_RW = 0;
 
-// access data as contiguous 8 bits, unsing pointer to the LSB byte of LATE register
+    // access data as contiguous 8 bits, using pointer to the LSB byte of LATE register
     unsigned char *pLCDData = (unsigned char *)(0xBF886430);
     *pLCDData = bData;
 
     DelayAprox10Us(10);   
 
-	// Set E
+	// Set En
 	lat_LCD_DISP_EN = 1;    
 
     DelayAprox10Us(5);
-	// Clear E
+	// Clear En
 	lat_LCD_DISP_EN = 0;
 
     DelayAprox10Us(5);
@@ -152,8 +152,9 @@ void LCD_WriteByte(unsigned char bData)
 **
 **	Description:
 **		This function reads a byte from the LCD. 
-**      It implements the parallel write using LCD_DISP_RS, LCD_DISP_RW, LCD_DISP_EN, 
+**      It implements the parallel read using LCD_DISP_RS, LCD_DISP_RW, LCD_DISP_EN, 
 **      LCD_DISP_RS pins, and data pins. 
+**      This is a low-level function called by LCD_ReadStatus function, so user should avoid calling it directly.
 **      The function uses pin related definitions from config.h file.
 **      
 **          
@@ -168,19 +169,15 @@ unsigned char LCD_ReadByte()
 
 	// set RW
 	lat_LCD_DISP_RW = 1;    
-
     
-	// Set E
+	// Set En
 	lat_LCD_DISP_EN = 1;
 
     DelayAprox10Us(50);   
 
-    // Clear E
+    // Clear En
 	lat_LCD_DISP_EN = 0;
   	bData = (unsigned char)(prt_LCD_DATA & (unsigned int)msk_LCD_DATA);
-
-
-
 	return bData;
 }
 
@@ -196,7 +193,7 @@ unsigned char LCD_ReadByte()
 **	Description:
 **		Reads the status of the LCD.  
 **      It clears the RS and calls LCD_ReadByte() function. 
-**      
+**      The function uses pin related definitions from config.h file.
 **          
 */
 unsigned char LCD_ReadStatus()
@@ -220,15 +217,16 @@ unsigned char LCD_ReadStatus()
 **	Description:
 **		Writes the specified byte as command. 
 **      It clears the RS and writes the byte to LCD. 
+**      The function uses pin related definitions from config.h file.
 **      
 **          
 */
 void LCD_WriteCommand(unsigned char bCmd)
 { 
-	// 1. Clear RS
+	// Clear RS
 	lat_LCD_DISP_RS = 0;
 
-	// 2. Write command byte
+	// Write command byte
 	LCD_WriteByte(bCmd);
 }
 
@@ -242,17 +240,19 @@ void LCD_WriteCommand(unsigned char bCmd)
 **		
 **
 **	Description:
-**		Writes the specified byte as data. 
+**      Writes the specified byte as data. 
 **      It sets the RS and writes the byte to LCD. 
+**      The function uses pin related definitions from config.h file.
+**      This is a low-level function called by LCD write functions, so user should avoid calling it directly.
 **      
 **          
 */
 void LCD_WriteDataByte(unsigned char bData)
 {
-	// 	1. Set RS 
+	// Set RS 
 	lat_LCD_DISP_RS = 1;
 
-	// 2. Write data byte
+	// Write data byte
 	LCD_WriteByte(bData);
 }
 
@@ -261,7 +261,7 @@ void LCD_WriteDataByte(unsigned char bData)
 /***	LCD_InitSequence
 **
 **  Synopsis:
-**      LCD_InitSequence(displaySetOptionDisplayOn);
+**              LCD_InitSequence(displaySetOptionDisplayOn);//set the display on
 **
 **	Parameters:
 **		unsigned char bDisplaySetOptions -  display options
@@ -323,6 +323,8 @@ void LCD_InitSequence(unsigned char bDisplaySetOptions)
 **
 **	Description:
 **      The LCD is initialized according to the parameter bDisplaySetOptions. 
+**      If one of the above mentioned optios is not OR-ed, 
+**      it means that the OFF action is performed for it.
 **      
 **          
 */
@@ -332,17 +334,14 @@ void LCD_DisplaySet(unsigned char bDisplaySetOptions)
 }
 
 /* ------------------------------------------------------------ */
-/***	LCD_DisplaySet
-**
-**  Synopsis:
-**      LCD_DisplayClear();
+/***	LCD_DisplayClear
 **
 **	Parameters:
 **
 **	Return Value:
 **		
 **	Description:
-**      Clears the display and returns the cursor home (upper left corner). 
+**      Clears the display and returns the cursor home (upper left corner, position 0 on row 0). 
 **      
 **          
 */
@@ -354,15 +353,13 @@ void LCD_DisplayClear()
 /* ------------------------------------------------------------ */
 /***	LCD_ReturnHome
 **
-**  Synopsis:
-**      LCD_ReturnHome();
 **
 **	Parameters:
 **
 **	Return Value:
 **		
 **	Description:
-**      Returns the cursor home (upper left corner). 
+**      Returns the cursor home (upper left corner, position 0 on row 0). 
 **      
 **          
 */
@@ -373,12 +370,8 @@ void LCD_ReturnHome()
 
 /* ------------------------------------------------------------ */
 /***	LCD_DisplayShift
-**
-**  Synopsis:
-**      LCD_DisplayShift(1);
-**
 **	Parameters:
-**		unsigned char fRight
+**		unsigned char fRight - specifies display shift direction:
 **				- 1 in order to shift right
 **				- 0 in order to shift left
 **
@@ -397,9 +390,6 @@ void LCD_DisplayShift(unsigned char fRight)
 
 /* ------------------------------------------------------------ */
 /***	LCD_CursorShift
-**
-**  Synopsis:
-**      LCD_CursorShift(1);
 **
 **	Parameters:
 **		unsigned char fRight
@@ -430,15 +420,19 @@ void LCD_CursorShift(unsigned char fRight)
 **		int idxLine	- line where the string will be displayed
 **          0 - first line of LCD
 **          1 - second line of LCD
-**		unsigned char idxPos - the starting position of the string within the line
-**          0 - first position from left
+**		unsigned char idxPos - the starting position of the string within the line. 
+**                                  The value must be between:
+**                                      0 - first position from left
+**                                      39 - last position for DDRAM for one line
+**                                  
 **
 **	Return Value:
 **		
 **	Description:
 **		Displays the specified string at the specified position on the specified line. 
-**		It sets the corresponding write position and then writes data bytes as the device is ready.
-**      Strings longer than 0x27 are trimmed.
+**		It sets the corresponding write position and then writes data bytes when the device is ready.
+**      Strings longer than 40 characters are trimmed. 
+**      It is possible that not all the characters will be visualized, as the display only visualizes 16 characters for one line.
 **      
 **          
 */
@@ -467,18 +461,17 @@ void LCD_WriteStringAtPos(char *szLn, unsigned char idxLine, unsigned char idxPo
 /* ------------------------------------------------------------ */
 /***	LCD_SetWriteCgramPosition
 **
-**  Synopsis:
-**      LCD_SetWriteCgramPosition(bAdr);
 **
 **	Parameters:
-**      unsigned char bAdr	- the write location. The position in CGRAM where the next data writes will put bytes.
+**      unsigned char bAdr	- the write location. The position in CGRAM where the next data write operations will put bytes.
 **
 **	Return Value:
 **		
 **	Description:
-**		Sets the DDRAM write position. This is the location where the next data write will be performed.
+**		Sets the DDRAM write position. This is the location where the next data write operation will be performed.
 **		Writing to a location auto-increments the write location.
-**      
+**      This is a low-level function called by LCD_WriteBytesAtPosCgram(), so user should avoid calling it directly.
+ **      
 **          
 */
 void LCD_SetWriteCgramPosition(unsigned char bAdr)
@@ -501,8 +494,9 @@ void LCD_SetWriteCgramPosition(unsigned char bAdr)
 **	Return Value:
 **		
 **	Description:
-**				Writes the specified number of bytes to CGRAM starting at the specified position.
-**				It sets the corresponding write position and then writes data bytes as the device is ready.
+**		Writes the specified number of bytes to CGRAM starting at the specified position. 
+**      This allows user characters to be defined.
+**		It sets the corresponding write position and then writes data bytes when the device is ready.
 **      
 **          
 */

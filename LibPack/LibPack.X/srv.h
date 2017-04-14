@@ -5,13 +5,13 @@
     Digilent
 
   @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
+    srv.h
 
   @Description
-    Describe the purpose of this file.
+        This file groups the declarations of the functions that implement
+        the SRV library (defined in srv.c).
+        Include the file in the project when this library is needed.
+        Use #include "srv.h" in the source files where the functions are needed.
  */
 /* ************************************************************************** */
 
@@ -19,14 +19,13 @@
 #define _SRV_H
 
 void SRV_Init();
-//void SRV_SetPhEnMotor1(unsigned char bDir, unsigned char bSpeed);
-
-//Local functions
-void SRV_ConfigureOCs();
-void SRV_ConfigurePins();
 void SRV_SetPulseMicroseconds1(unsigned short usVal);
 void SRV_SetPulseMicroseconds2(unsigned short usVal);
 void SRV_Close();
+
+// private functions
+void SRV_ConfigureOCs();
+void SRV_ConfigurePins();
 
 #endif /* _SRV_H */
 

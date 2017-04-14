@@ -5,13 +5,13 @@
     Digilent
 
   @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
+    utils.h
 
   @Description
-    Describe the purpose of this file.
+    This file groups the declarations of the functions that implement
+        the utils library (defined in utils.c).
+        Include the file in the project when this library is needed.
+        Use #include "utils.h" in the source files where the functions are needed.
  */
 /* ************************************************************************** */
 

@@ -41,6 +41,8 @@ void AudioDemo();
 
 int main(int argc, char** argv) 
 {
+//    BasicIODemo();       
+//    SSDDemo();
     AudioDemo();
     return (1);
 }
@@ -55,9 +57,9 @@ int main(int argc, char** argv)
 **		
 **
 **	Description:
-**		This function initializes the LCD, LED, SWT modules. according to the SWT settings, it initializes Audio module with different parameters
+**		This function initializes the LCD, SSD, LED, SWT modules.
 **      It reads the switches. The functions allocated to each switch are:
-**      Switch 0 - start generating a sine wave on the audio output.
+**      Switch 0 - start generating a sin wave on the audio output.
 **      Switch 1 - start "mirror": the MIC is read and the value is outputed "live" to the audio output.
 **      Switch 2 - start recording from MIC. The samples are stored in a circular manner in a buffer.
 **      Switch 3 - start playing the samples recorded from MIC. The samples are read from the buffer in a circular manner, and sent to the Audio output
@@ -68,25 +70,25 @@ int main(int argc, char** argv)
 void AudioDemo()
 {
     unsigned int baseCnt = 0;
-    //perform basic initializations
     LCD_Init(); 
     SWT_Init();
     LED_Init();
-    //use the LCD screen to display the name of the currently running demo
     LCD_WriteStringAtPos("Audio Demo", 0, 0);
     LCD_WriteStringAtPos("Digilent", 1, 0);
+                
     while(1)
     {
        if(++baseCnt == 500000) // ensure timing by dividing the frequency of while loops
         {
             baseCnt = 0;
+            
             // check the switches status
             if(SWT_GetValue(0))
             {
                 if(AUDIO_GetAudioMode() != 0)
                 {    
                     LED_SetValue(0, 1);
-                    AUDIO_Init(0);  // start playing sine
+                    AUDIO_Init(0);  // start play sin
                 }
             }
             else
@@ -94,7 +96,7 @@ void AudioDemo()
                 LED_SetValue(0, 0);
                 if(AUDIO_GetAudioMode() == 0)
                 {    
-                    AUDIO_Close();  // close audio module
+                    AUDIO_Close();  // close play sin
                 }
             }
             if(SWT_GetValue(1))
@@ -102,7 +104,7 @@ void AudioDemo()
                 if(AUDIO_GetAudioMode() != 1)
                 {    
                     LED_SetValue(1, 1);
-                    AUDIO_Init(1);  // start mirroring
+                    AUDIO_Init(1);  // start mirror
                 }
             }
             else
@@ -110,7 +112,7 @@ void AudioDemo()
                LED_SetValue(1, 0);
                 if(AUDIO_GetAudioMode() == 1)
                 {    
-                    AUDIO_Close();  // close audio module
+                    AUDIO_Close();  // close mirror
                 }               
             }
             if(SWT_GetValue(2))
@@ -118,7 +120,7 @@ void AudioDemo()
                 if(AUDIO_GetAudioMode() != 2)
                 {    
                     LED_SetValue(2, 1);
-                    AUDIO_Init(2);  // start recording
+                    AUDIO_Init(2);  // start record
                 }
             }
             else
@@ -126,7 +128,7 @@ void AudioDemo()
                 LED_SetValue(2, 0);
                 if(AUDIO_GetAudioMode() == 2)
                 {    
-                    AUDIO_Close();  // close audio module
+                    AUDIO_Close();  // close record
                 }              
             }
             if(SWT_GetValue(3))
@@ -134,7 +136,7 @@ void AudioDemo()
                 if(AUDIO_GetAudioMode() != 3)
                 {    
                     LED_SetValue(3, 1);
-                    AUDIO_Init(3);  // start playing recorded sound
+                    AUDIO_Init(3);  // start play recorded
                 }
             }
             else
@@ -142,7 +144,7 @@ void AudioDemo()
                 LED_SetValue(3, 0);
                 if(AUDIO_GetAudioMode() == 3)
                 {    
-                    AUDIO_Close();  // close audio module 
+                    AUDIO_Close();  // close play recorded
                 }              
             }         
        }

@@ -5,12 +5,13 @@
     Digilent
 
   @File Name
-    mmic.c
+    mic.c
 
   @Description
-        This file groups the functions that implement the MIC.
+        This file groups the functions that implement the MIC module.
         The library is used to handle analog input from the microphone. 
-        It relies on the ADC module. 
+        The analog value is converted to digital value using 10 bits analog to digital 
+        conversion implemented in ADC library. 
         Include the file as well as adc.c and adc.h in the project when this 
         library is needed.	
  
@@ -41,7 +42,7 @@
 void MIC_Init()
 {
     MIC_ConfigurePins();
-    ADC_ConfigureAnalogInputManual();
+    ADC_Init();
 }
 
 /* ------------------------------------------------------------ */
@@ -54,9 +55,9 @@ void MIC_Init()
 **		
 **
 **	Description:
-**		This function configures the pins involved in the AIC module: 
-**      The following pins are configured as analog input: MIC.
+**		This function configures the MIC pin as analog input. 
 **      The function uses pin related definitions from config.h file.
+**      This is a low-level function called by MIC_Init(), so user should avoid calling it directly.
 **      
 **          
 */
@@ -75,11 +76,11 @@ void MIC_ConfigurePins()
 **		
 **
 **	Return Value:
-**		unsigned int    - the result of analog to digital conversion of MIC value
+**		unsigned int    - the 16 LSB bits contain the result of analog to digital conversion of MIC value
 **
 **	Description:
-**		This function returns the digital value corresponding to the MIC analog 
-**      pin. 
+**		This function returns the digital value corresponding to the MIC analog pin
+**      as the result of analog to digital conversion performed by the ADC module. 
 **      It can be used to sample the microphone input.
 **      
 **          

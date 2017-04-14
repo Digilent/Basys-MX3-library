@@ -20,7 +20,7 @@
 #include "uart.h"
 #include <xc.h>  
 #include <sys/attribs.h>
-
+#include <stdio.h>
 
 
 // the state structure definition
@@ -67,16 +67,16 @@ void CETest_ExitUART();
 // the state definitions
 StateMachinesElem stateMachinesElems[] = 
 {
-    {500, 20, &CETest_InitPMODA, &CETest_StepPMODA, &CETest_ExitPMODA},
-    {500, 20, &CETest_InitPMODB, &CETest_StepPMODB, &CETest_ExitPMODB},
-    {500, 20, &CETest_InitLeds, &CETest_StepLeds, &CETest_ExitLeds},
-    {500, 20, &CETest_InitRGBLed, &CETest_StepRGBLed, &CETest_ExitRGBLed},
-    {500, 0, &CETest_InitSRV, 0, &CETest_ExitSRV},
-    {500, 20, &CETest_InitSSD, &CETest_StepSSD, &CETest_ExitSSD},
-    {500, 0, &CETest_InitAUDIO, 0, &CETest_ExitAUDIO},
-    {100, 0, &CETest_InitACL, 0, &CETest_ExitACL},
-   {100, 0, &CETest_InitSPIFlash, 0, &CETest_ExitSPIFlash},
-    {100, 0, &CETest_InitIRDA, 0, &CETest_ExitIRDA},
+//    {500, 20, &CETest_InitPMODA, &CETest_StepPMODA, &CETest_ExitPMODA},
+//    {500, 20, &CETest_InitPMODB, &CETest_StepPMODB, &CETest_ExitPMODB},
+//    {500, 20, &CETest_InitLeds, &CETest_StepLeds, &CETest_ExitLeds},
+//    {500, 20, &CETest_InitRGBLed, &CETest_StepRGBLed, &CETest_ExitRGBLed},
+//    {500, 0, &CETest_InitSRV, 0, &CETest_ExitSRV},
+//    {500, 20, &CETest_InitSSD, &CETest_StepSSD, &CETest_ExitSSD},
+//    {500, 0, &CETest_InitAUDIO, 0, &CETest_ExitAUDIO},
+//    {100, 0, &CETest_InitACL, 0, &CETest_ExitACL},
+//   {100, 0, &CETest_InitSPIFlash, 0, &CETest_ExitSPIFlash},
+//    {100, 0, &CETest_InitIRDA, 0, &CETest_ExitIRDA},
     {1000, 0, &CETest_InitMOT, 0, &CETest_ExitMOT},
     {100, 0, &CETest_InitUART, 0, &CETest_ExitUART}
 };
@@ -708,7 +708,7 @@ void CETest_ExitUART()
  *          - after the time described by state counter value, the State Exit function is called (if defined), and the new state becomes active (in a circular manner)
  **          
 */
-void __ISR(_TIMER_4_VECTOR, ipl2) Timer4SR(void) 
+void __ISR(_TIMER_4_VECTOR, IPL2SRS) Timer4SR(void) 
 {
     static unsigned int idxTimerWithinStep = 0, idxTimerWithinState = 0, idxState = 0, idxStep = 0;
     if(stateMachinesElems[idxState].pfStepTestFnc && 
@@ -775,7 +775,7 @@ void Timer4Setup()
     static int fTimerInitialised = 0;
     if(!fTimerInitialised)
     {
-        INTDisableInterrupts();             // INT step 2: disable interrupts at CPU
+        macro_disable_interrupts;             // INT step 2: disable interrupts at CPU
                                           // INT step 3: setup peripheral
         T4CONbits.TCKPS = 7;                //            1:256 prescale value
         T4CONbits.TGATE = 0;                //             not gated input (the default)
@@ -787,7 +787,7 @@ void Timer4Setup()
         IPC4bits.T4IS = 0;                  //             subpriority
         IFS0bits.T4IF = 0;                  // INT step 5: clear interrupt flag
         IEC0bits.T4IE = 1;                  // INT step 6: enable interrupt
-        INTEnableSystemMultiVectoredInt();  // INT step 7: enable interrupts at CPU
+        macro_enable_interrupts();  // INT step 7: enable interrupts at CPU
         fTimerInitialised = 1;
     }
 }

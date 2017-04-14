@@ -18,13 +18,9 @@
 #ifndef _UART_H    /* Guard against multiple inclusion */
 #define _UART_H
 
-#define	cchRxMax	0xFF//64	// maximum number of characters a command
-						// can contain including the CRLF ("\r\n")
+#define	cchRxMax	0xFF	// maximum number of characters a CR+LF terminated string
 void UART_InitPoll(unsigned int baud);
 void UART_Init(unsigned int baud);
-void UART_ConfigurePins();
-void UART_ConfigureUart(unsigned int baud);
-void UART_ConfigureUartRXInt(unsigned int baud);
 void UART_CloseUART();
 
 
@@ -33,6 +29,13 @@ unsigned char UART_GetCharPoll();
 unsigned char UART_AvaliableRx();
 unsigned char UART_GetString( char* pchBuff, int cchBuff );
 unsigned char UART_GetStringPoll(unsigned char *pText);
+
+// private functions
+void UART_ConfigurePins();
+void UART_ConfigureUart(unsigned int baud);
+void UART_ConfigureUartRXInt(unsigned int baud);
+
+
 //#ifdef __cplusplus
 //extern "C" {
 //#endif

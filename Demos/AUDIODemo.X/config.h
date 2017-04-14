@@ -39,28 +39,13 @@ extern "C" {
 #define  lat_LEDS_GRP_ADDR   0xBF886030
 
 #define  lat_LEDS_LED0  LATAbits.LATA0
-#define LEDS_Led0SetValue(val) lat_LEDS_LED0 = val
-
 #define  lat_LEDS_LED1  LATAbits.LATA1
-#define LEDS_Led1SetValue(val) lat_LEDS_LED1 = val
-
 #define  lat_LEDS_LED2  LATAbits.LATA2
-#define LEDS_Led2SetValue(val) lat_LEDS_LED2 = val
-
 #define  lat_LEDS_LED3  LATAbits.LATA3
-#define LEDS_Led3SetValue(val) lat_LEDS_LED3 = val
-
 #define  lat_LEDS_LED4  LATAbits.LATA4
-#define LEDS_Led4SetValue(val) lat_LEDS_LED4 = val
-
 #define  lat_LEDS_LED5  LATAbits.LATA5
-#define LEDS_Led5SetValue(val) lat_LEDS_LED5 = val
-
 #define  lat_LEDS_LED6  LATAbits.LATA6
-#define LEDS_Led6SetValue(val) lat_LEDS_LED6 = val
-
 #define  lat_LEDS_LED7  LATAbits.LATA7
-#define LEDS_Led7SetValue(val) lat_LEDS_LED7 = val
 
 // SWT
 
@@ -171,12 +156,6 @@ extern "C" {
 #define ansel_LCD_DISP_RS   ANSELBbits.ANSB15
 #define rp_LCD_DISP_RS      RPB15R
 
-/*
-#define tris_LCD_DISP_RS    TRISDbits.TRISD12
-#define lat_LCD_DISP_RS     LATDbits.LATD12
-#define ansel_LCD_DISP_RS   ANSELDbits.ANSD12
-#define rp_LCD_DISP_RS      RPD12R
-*/
 
 #define tris_LCD_DISP_RW    TRISDbits.TRISD5
 #define  lat_LCD_DISP_RW    LATDbits.LATD5
@@ -218,11 +197,11 @@ extern "C" {
 
 #define tris_SPIFLASH_CE    TRISFbits.TRISF8
 #define  lat_SPIFLASH_CE    LATFbits.LATF8
-//#define rp_SPIFLASH_CE      RPF8R
+
 
 #define tris_SPIFLASH_SCK   TRISFbits.TRISF6
 #define  lat_SPIFLASH_SCK   LATFbits.LATF6
-//#define   rp_SPIFLASH_SCK   RPF6R
+
 
 
 #define tris_SPIFLASH_SO   TRISFbits.TRISF7

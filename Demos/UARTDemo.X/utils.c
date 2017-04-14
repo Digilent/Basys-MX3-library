@@ -5,13 +5,13 @@
     Digilent
 
   @File Name
-    filename.c
-
-  @Summary
-    Brief description of the file.
+    utils.c
 
   @Description
-    Describe the purpose of this file.
+        This library implements the delay functionality used in other libraries.  
+        The delay is implemented using loop, so the delay time is not exact. 
+        For exact timing use timers.
+        Include the file in the project, together with utils.h, when this library is needed	
  */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@
 /***    Delay100Us
 **
 **	Synopsis:
-**		Delay100Us(t100usDelay)
+**		Delay100Us(100)
 **
 **	Parameters:
 **		t100usDelay - the amount of time you wish to delay in hundreds of microseconds

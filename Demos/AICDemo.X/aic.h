@@ -18,8 +18,10 @@
 #define _AIC_H
 
 void AIC_Init();
-void AIC_ConfigurePins();
 unsigned int AIC_Val();
+//private functions:
+void AIC_ConfigurePins();
+
 //#ifdef __cplusplus
 //extern "C" {
 //#endif

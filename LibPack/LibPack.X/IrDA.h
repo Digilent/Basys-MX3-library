@@ -5,13 +5,12 @@
     Digilent
 
   @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
+    IrDA.h
 
   @Description
-    Describe the purpose of this file.
+     This file groups the declarations of the functions that implement
+        the IRDA library (defined in IrDA.c).
+        Use #include "IrDA.h" in the source files where the functions are needed.
  */
 /* ************************************************************************** */
 
@@ -25,7 +24,6 @@
 #define IRDA_RX         prt_IRDA_RX
 
 void IRDA_Init(unsigned int baud);
-void IRDA_ConfigurePins();
 void IRDA_Set_FIR_Mode();
 void IRDA_Set_SMIR_Mode();
 void IRDA_ConfigureIRDAOverUART5(unsigned int baud);
@@ -33,6 +31,9 @@ void IRDA_UARTPutChar(char ch);
 
 unsigned char IRDA_UART_AvaliableRx();
 unsigned char IRDA_UART_GetChar(unsigned int timeout, char *error);
+
+//private
+void IRDA_ConfigurePins();
         
 #endif	/* IRDA_H */
 

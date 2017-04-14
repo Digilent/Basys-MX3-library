@@ -8,8 +8,8 @@
       <itemPath>uart.h</itemPath>
       <itemPath>utils.h</itemPath>
       <itemPath>lcd.h</itemPath>
-      <itemPath>pmods.h</itemPath>
       <itemPath>uartjb.h</itemPath>
+      <itemPath>pmods.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -22,8 +22,8 @@
       <itemPath>uart.c</itemPath>
       <itemPath>utils.c</itemPath>
       <itemPath>lcd.c</itemPath>
-      <itemPath>pmods.c</itemPath>
       <itemPath>uartjb.c</itemPath>
+      <itemPath>pmods.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

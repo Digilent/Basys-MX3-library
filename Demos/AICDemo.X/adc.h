@@ -18,7 +18,7 @@
 #define _ADC_H
 
 
-void ADC_ConfigureAnalogInputManual();
+void ADC_Init();
 unsigned int ADC_AnalogRead(unsigned char analogPIN);
 //#ifdef __cplusplus
 //extern "C" {

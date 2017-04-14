@@ -5,13 +5,13 @@
     Digilent
 
   @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
+    pmods.h
 
   @Description
-    Describe the purpose of this file.
+     This file groups the declarations of the functions that implement
+        the Pmods library (defined in pmods.c).
+        Include the file in the project when this library is needed.
+        Use #include "pmods.h" in the source files where the functions are needed.
  */
 /* ************************************************************************** */
 

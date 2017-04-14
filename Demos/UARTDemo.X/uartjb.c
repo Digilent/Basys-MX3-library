@@ -61,28 +61,25 @@ void __ISR(_UART_1_VECTOR, IPL7SRS) Uart1Handler (void)
 	        if (cchRxMax > ichRx)
 	        {
 	            // Yes.
-	    
                 rgchRx[ichRx] = bVal;
-	
 	            // Is this the last character of the command?
 	            if(('\n' == rgchRx[ichRx] ) && ('\r' == rgchRx[ichRx-1]))
 	            {
 	                // Yes.
-	
 	                fRxDone = 1;
-	            }   // end if
+	            }   
 	
 	            ichRx++;
-	        }   // end if
+	        }   
 	        else
 	        {
 	            // No we don't have space to store anymore characters.
 	            // Mark the command as complete.
 	
 	            fRxDone = 1;
-	        }   // end else
-    	}  	// end if
-	}  // end while	
+	        }   
+    	}  
+	}  
 	//Clear the Uart1 interrupt flag.
 	IFS1bits.U1RXIF = 0;
 }
@@ -97,12 +94,11 @@ void __ISR(_UART_1_VECTOR, IPL7SRS) Uart1Handler (void)
 **		
 **
 **	Description:
-**		This function initializes the hardware involved in the UART module, in 
+**		This function initializes the hardware involved in the UARTJB module, in 
 **      the UART receive with interrupts mode.
-**      The following digital pins are configured as digital outputs: UARTJB_TX
-**      The following digital pins are configured as digital inputs: UARTJB_RX.
-**      The UARTJB_TX and UARTJB_RX are mapped over the UART1 interface.
-**      The UART1 module of PIC32 is configured to work at the specified baud.
+**      The JB2 digital pin is configured as digital output, and mapped over U1TX.
+**      The JB3 digital pin is configured as digital input, and mapped over U1RX.
+**      The UART1 module of PIC32 is configured to work at the specified baud, no parity and 1 stop bit.
 **      
 **          
 */
@@ -122,12 +118,11 @@ void UARTJB_Init(unsigned int baud)
 **		
 **
 **	Description:
-**		This function initializes the hardware involved in the UART module, in 
+**		This function initializes the hardware involved in the UARTJB module, in 
 **      the UART receive without interrupts (polling method).
-**      The following digital pins are configured as digital outputs: UARTJB_TX
-**      The following digital pins are configured as digital inputs: UARTJB_RX.
-**      The UARTJB_TX and UARTJB_RX are mapped over the UART1 interface.
-**      The UART1 module of PIC32 is configured to work at the specified baud.
+**      The JB2 digital pin is configured as digital output, and mapped over U1TX.
+**      The JB3 digital pin is configured as digital input, and mapped over U1RX.
+**      The UART1 module of PIC32 is configured to work at the specified baud, no parity and 1 stop bit.
 **      
 **          
 */
@@ -198,7 +193,7 @@ void UARTJB_ConfigureUart(unsigned int baud)
 */
 void UARTJB_ConfigureUartRXInt(unsigned int baud)
 {
-    macro_disable_interrupts;             // disable interrupts 
+    macro_disable_interrupts;  // disable interrupts 
 
     UARTJB_ConfigureUart(baud);
 
@@ -206,7 +201,7 @@ void UARTJB_ConfigureUartRXInt(unsigned int baud)
     IPC7bits.U1IS = 3;
 
 	IFS1bits.U1RXIF = 0;    //Clear the Uart1 interrupt flag.
-    IEC1bits.U1RXIE = 1; // enable rx interrupt
+    IEC1bits.U1RXIE = 1;   // enable RX interrupt
     
 
     macro_enable_interrupts();  // enable interrupts 
@@ -221,12 +216,12 @@ void UARTJB_ConfigureUartRXInt(unsigned int baud)
 **		
 **
 **	Description:
-**		This function configures the digital pins involved in the SPIFLASH module: 
-**      The following digital pins are configured as digital outputs: UARTJB_TX
-**      The following digital pins are configured as digital inputs: UARTJB_RX.
-**      The UARTJB_TX and UARTJB_RX are mapped over the UART1 interface.
+**		This function configures the digital pins involved in the UARTJB module: 
+**      The JB2 digital pin is configured as digital output, and mapped over U1TX.
+**      The JB3 digital pin is configured as digital input, and mapped over U1RX.
 **      The function uses pin related definitions from config.h file.
-**      
+**      This is a low-level function called by UARTJB_Init(), so user should avoid calling it directly. 
+ **      
 **          
 */
 void UARTJB_ConfigurePins()
@@ -239,9 +234,6 @@ void UARTJB_ConfigurePins()
     tris_UARTJB_RX = 1;   //RX digital input
     rp_UARTJB_RX = 3;     // 0011 RD10
 }
-
-
-
 
 /***	UARTJB_PutChar
 **
@@ -271,7 +263,7 @@ void UARTJB_PutChar(char ch)
 **		
 **
 **	Description:
-**		This function transmits all the characters from a zero terminated string over UART1. 
+**		This function transmits all the characters from a zero terminated string over UART1. The terminator character is not sent.
 **      
 **          
 */
@@ -283,8 +275,6 @@ void UARTJB_PutString(char szData[])
         UARTJB_PutChar((*(pData++)));
     }
 }
-
-
 
 /***	UARTJB_AvaliableRx
 **
@@ -334,20 +324,20 @@ unsigned char UARTJB_GetCharPoll()
 /***	UARTJB_GetStringPoll
 **
 **	Parameters:
-**          - unsigned char *pText - Pointer to a buffer storing the received bytes.
+**          - unsigned char *pText - Pointer to a buffer to store the received bytes.
 **          
 **
 **	Return Value:
 **          unsigned char  receive status
-**              1 if at least one received byte is available
+**              1 if at least one received byte is available, the received characters are placed in pText buffer
 **              0 if no received bytes are available 
 **
 **	Description:
-**		This function returns a zero terminated string to be received over UART1, 
-**      using polling method.
-**      If a received byte is available, this function calls repeatedly UARTJB_GetCharPoll 
-**      until a zero value is received over UART1.
-**          
+**		This function returns a zero terminated string to be received over UART1, using polling method.
+**      While a received byte is available, this function calls repeatedly UART_GetCharPoll 
+**      until no values are received over UART1.
+**      It returns 0 if no received bytes are available, and returns 1 if at least one byte was received.
+ **          
 */
 unsigned char UARTJB_GetStringPoll(unsigned char *pText)
 {
@@ -366,17 +356,15 @@ unsigned char UARTJB_GetStringPoll(unsigned char *pText)
 /***	UARTJB_GetString
 **
 **	Parameters:
-**		pchBuff - pointer to a char buffer to hold the received sz
-**		cchBuff - size of the buffer to hold the sz
+**		char* pchBuff - pointer to a char buffer to hold the received zero terminated string 
+**		int cchBuff - size of the buffer to hold the zero terminated string
 **          
 **
 **	Return Value:
 **          unsigned char  receive status
-**                  > 0 - the number of characters contained in the command
-**                  0	- a command hasn't been received
-**                  -1	- a buffer overrun occurred
-**                  -2	- a buffer underrun occurred (user buffer not large enough)
-**                  -3	- an invalid (0 char count) command was received  
+**                  > 0 - the number of characters contained in the string
+**                  0	- a CR+LF terminated string hasn't been received
+**                  -3	- an invalid (0 char count) CR+LF terminated string was received  
 **
 **	Description:
 **		This function returns a zero terminated string to be received over UART1,  
@@ -392,41 +380,15 @@ unsigned char UARTJB_GetString( char* pchBuff, int cchBuff )
 {
 	unsigned char ich;
 	
-	// Have we finished receiving a command via UART1?
+	// Have we finished receiving a CR+LF terminated string via UART1?
 	if(!fRxDone)
 	{
 		return 0;
 	}
-	
-	// Did a buffer overrun occur?
-	if((cchRxMax == ichRx) && (('\r' != rgchRx[ichRx-2]) || ( '\n' != rgchRx[ichRx-1] )))
-	{
-		// A buffer overrun occured.
-		
-		macro_disable_interrupts;
-		fRxDone = 0;
-		ichRx = 0;
-		macro_enable_interrupts();
-		
-		return -1;
-	}
-	
-	// Does the user buffer contain enough space to hold the command?
-	if(cchBuff < ichRx - 1)
-	{
-		// A buffer underrun occured.
-		macro_disable_interrupts;
-		fRxDone = 0;
-		ichRx = 0;
-		macro_enable_interrupts();
-		
-		return -2;
-	}
-	
-	// Was a 0 character command received?
+	// Was a 0 character CR+LF terminated string received?
 	if(2 == ichRx )
 	{
-		// A zero character length command was received.
+		// A zero character length CR+LF terminated string was received.
 		macro_disable_interrupts;
 		fRxDone = 0;
 		ichRx = 0;

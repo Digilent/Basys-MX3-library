@@ -10,7 +10,7 @@
   @Description
         This file groups the functions that implement the PMODS library.
         Pins from PMODA and PMODB can be initialized as digital input / output pins, 
-        their value can be access using set / get functions
+        their value can be accessed using set / get functions
         Include the file in the project, together with config.h when this library is needed.
  
   @Author
@@ -37,7 +37,7 @@
 **		unsigned char bPmod     - the PMOD where the pin is located
 **                                 0 - PMODA
 **                                 1 - PMODB
-**     unsigned char bPos      - the pin position in the Pmod (allowed values 1-4, 7-10
+**     unsigned char bPos      - the pin position in the Pmod (allowed values 1-4, 7-10)
 **                                 1  - JA1 (if bPmod = 0), JB1 (if bPmod = 1)
 **                                 2  - JA2 (if bPmod = 0), JB2 (if bPmod = 1)
 **                                 3  - JA3 (if bPmod = 0), JB3 (if bPmod = 1)
@@ -49,12 +49,12 @@
 **     unsigned char bDir      - the pin direction 
 **                                 0  - Output
 **                                 1  - Input
-**     unsigned char pullup    - the pullup property of the pin
-**                                 0  - No pullup
-**                                 1  - Pullup
-**     unsigned char pulldown  - the pulldown property of the pin
-**                                 0  - No pulldown
-**                                 1  - Pulldown
+**     unsigned char pull-up    - the pull-up property of the pin
+**                                 0  - No pull-up
+**                                 1  - Pull-up
+**     unsigned char pull-down  - the pull-down property of the pin
+**                                 0  - No pull-down
+**                                 1  - Pull-down
 **
 **	Return Value:
 **		
@@ -63,6 +63,7 @@
 **      This function configures the pins located in the PMODA and PMODB connectors 
 **      to be used as digital input / output, also allowing pullup and pulldown properties to be specified.
 **      This function uses pin related definitions from config.h file.  
+**      If the bPmod and bPos do not specify a valid pin, nothing happens.
 */
 void PMODS_InitPin(unsigned char bPmod, unsigned char bPos, unsigned char bDir, unsigned char pullup, unsigned char pulldown)
 {
@@ -97,7 +98,7 @@ void PMODS_InitPin(unsigned char bPmod, unsigned char bPos, unsigned char bDir, 
                 break;
                 case 4: 
                 // JA4
-                    ansel_PMODS_JA4 = 0;    // set pis as digital
+                    ansel_PMODS_JA4 = 0;    // set pin as digital
                     rp_PMODS_JA4 = 0;   // default pin function (no remapable)
                     tris_PMODS_JA4 = bDir;
                     cnpu_PMODS_JA4 = pullup;        
@@ -112,7 +113,7 @@ void PMODS_InitPin(unsigned char bPmod, unsigned char bPos, unsigned char bDir, 
                 break;
                 case 8:
                 // JA8
-                    ansel_PMODS_JA8 = 0;    // set pis as digital
+                    ansel_PMODS_JA8 = 0;    // set pin as digital
                     rp_PMODS_JA8 = 0;   // default pin function (no remapable)
                     tris_PMODS_JA8 = bDir;
                     cnpu_PMODS_JA8 = pullup;        
@@ -120,7 +121,7 @@ void PMODS_InitPin(unsigned char bPmod, unsigned char bPos, unsigned char bDir, 
                 break;
                 case 9: 
                 // JA9
-                    ansel_PMODS_JA9 = 0;    // set pis as digital
+                    ansel_PMODS_JA9 = 0;    // set pin as digital
                     rp_PMODS_JA9 = 0;   // default pin function (no remapable)
                     tris_PMODS_JA9 = bDir;
                     cnpu_PMODS_JA9 = pullup;        
@@ -128,7 +129,7 @@ void PMODS_InitPin(unsigned char bPmod, unsigned char bPos, unsigned char bDir, 
                 break;
                 case 10: 
                 // JA10
-                    ansel_PMODS_JA10 = 0;    // set pis as digital
+                    ansel_PMODS_JA10 = 0;    // set pin as digital
                     rp_PMODS_JA10 = 0;   // default pin function (no remapable)
                     tris_PMODS_JA10 = bDir;
                     cnpu_PMODS_JA10 = pullup;        
@@ -165,7 +166,6 @@ void PMODS_InitPin(unsigned char bPmod, unsigned char bPos, unsigned char bDir, 
                 break;
                 case 4: 
                 // JB4
-                    ansel_PMODS_JA4 = 0;    // set pis as digital
                     rp_PMODS_JB4 = 0;   // default pin function (no remapable)
                     tris_PMODS_JB4 = bDir;
                     cnpu_PMODS_JB4 = pullup;        
@@ -234,7 +234,7 @@ void PMODS_InitPin(unsigned char bPmod, unsigned char bPos, unsigned char bDir, 
 **	Description:
 **		This function returns the value of a digital pin located in the PMODA and PMODB connectors, 
 **      specified by bPmod and bPos
-**      If bPmod and bPos do not specify a valid pin, 0xFF is performed.
+**      If bPmod and bPos do not specify a valid pin, 0xFF is returned.
 **      This function uses pin related definitions from config.h file.
 **         
 */

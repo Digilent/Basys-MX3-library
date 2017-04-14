@@ -41,8 +41,8 @@
 **		
 **
 **	Description:
-**		This function initializes the hardware involved in the BTN module: 
-**      the pins corresponding to buttons are initialized as digital inputs.
+**		This function initializes the hardware involved in the BTN module. 
+**      The pins corresponding to buttons are initialized as digital inputs.
 **          
 */
 void BTN_Init()
@@ -60,8 +60,9 @@ void BTN_Init()
 **		
 **
 **	Description:
-**		This function configures the IO pins involved in the BTN module as digital input pins 
-**      
+**		This function configures the IO pins used in the BTN module as digital input pins. 
+**      The function uses pin related definitions from config.h file.
+**      This is a low-level function called by BTN_Init(), so user should avoid calling it directly.        
 **          
 */
 void BTN_ConfigurePins()
@@ -92,13 +93,13 @@ void BTN_ConfigurePins()
 **                                  4, 'D', 'd': BTND
 **
 **	Return Value:
-**		unsigned char   - the value corresponding to the specified switch:
+**		unsigned char   - the value corresponding to the specified button:
 **                                  0 when corresponding button is not pressed
 **                                  1 when corresponding button is pressed
-**		
+**                      - 0xFF if btn is not between 0 and 4, or one of 'U', 'u', 'L', 'l', 'C', 'c', 'R', 'r', 'D', 'd' 
 **
 **	Description:
-**		This function gets the value of the BTN specified by btn.
+**		This function gets the value of the BTN specified by btn parameter.
 **      If the value provided for btn is not between 0 and 4, 
 **      or one of 'U', 'u', 'L', 'l', 'C', 'c', 'R', 'r', 'D', 'd', then the function returns 0xFF.
 **          
@@ -159,10 +160,13 @@ unsigned char BTN_GetValue(unsigned char btn)
 **		
 **
 **	Description:
-**		This function gets the value of the all 5 buttons as a single value on 8 bits.  
-**      The 5 LSB bits from returned value corresponds to a button: 
-**      bit 0 corresponds to BTNU, bit 1 corresponds to BTNL, bit 2 corresponds to BTNC, 
- *      bit 3 corresponds to BTNR, bit 4 corresponds to BTND (see return value explanation).          
+**		This function gets the value of the all 5 buttons as a single value represented on 8 bits.  
+**      The 5 LSB bits from returned value byte correspond to a button: 
+**      bit 0 corresponds to BTNU,
+**      bit 1 corresponds to BTNL, 
+**      bit 2 corresponds to BTNC, 
+**      bit 3 corresponds to BTNR, 
+**      bit 4 corresponds to BTND (see return value description).          
 */
 unsigned char BTN_GetGroupValue()
 {

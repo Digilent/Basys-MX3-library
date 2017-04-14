@@ -5,12 +5,12 @@
     Digilent
 
   @File Name
-    filename.c
+    swt.c
 
   @Description
         This file groups the functions that implement the SWT library.
         The functions implement basic digital input functionality.
-        Include the file in the project when this library is needed.
+        Include the file in the project, together with config.h, when this library is needed.
 
   @Author
     Cristian Fatu 
@@ -57,8 +57,9 @@ void SWT_Init()
 **		
 **
 **	Description:
-**		This function configures the IO pins involved in the SWT module as digital input pins 
-**      
+**		This function configures the IO pins involved in the SWT module as digital input pins. 
+**      The function uses pin related definitions from config.h file.
+**      This is a low-level function called by SWT_Init(), so user should avoid calling it directly.      
 **          
 */
 void SWT_ConfigurePins()
@@ -76,8 +77,7 @@ void SWT_ConfigurePins()
     // disable analog (set pins as digital))
     ansel_SWT_SWT5 = 0;
     ansel_SWT_SWT6 = 0;
-    ansel_SWT_SWT7 = 0;
-    
+    ansel_SWT_SWT7 = 0;    
 }
 
 /***	SWT_GetValue
@@ -89,17 +89,18 @@ void SWT_ConfigurePins()
 **		unsigned char   - the value corresponding to the specified switch:
 **                                  0 when SW<bNo> is turned off
 **                                  1 when SW<bNo> is turned on
+**                      - 0xFF if bNo is not within 0 - 7.
 **		
 **
 **	Description:
-**		This function gets the value of the switch specified by bNo. 
-**      If the value provided for bNo is not between 0 and 7, only the LSB 3 bits will be considered.
+**		This function gets the value of the switch specified by bNo (0 or 1). 
+**      If the value provided for bNo is not between 0 and 7, 0xFF is returned.
 **          
 */
 unsigned char SWT_GetValue(unsigned char bNo)
 {
-    unsigned bResult = 0;
-    bNo &= 0x07;    // cast the value to 0-7
+    unsigned bResult = 0xFF;
+
     switch (bNo)
     {
         case 0: 
@@ -159,9 +160,6 @@ unsigned char SWT_GetGroupValue()
     }
     return bResult;
 }
-
-
-
 /* *****************************************************************************
  End of File
  */

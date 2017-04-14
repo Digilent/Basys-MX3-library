@@ -5,15 +5,15 @@
     Digilent
 
   @File Name
-    filename.c
+    rgbled.c
 
   @Description
-        This file groups the functions that implement the RGBLED library.
+        This file groups the functions that implement the RGBLed library.
         The colors are generated using PDM method, using accumulators updated 
         periodically (Timer5 is used).
-        The source file also contains (commented), the PWM implementation, using 
+        The source file also contains (commented) the PWM implementation, using 
         OC3, OC4, OC5 and Timer2.
-        Include the file in the project when this library is needed, together with config.h.
+        Include the file in the project, together with config.h, when this library is needed.
  */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ volatile unsigned char bColR, bColG, bColB;
 **      The 8 bits component color value is added to the corresponding 16 bits accumulator.
 **      The 9th bit of the accumulator is considered the carry bit. 
 **      The resulted carry bits are assigned to the digital pins corresponding to each color (LED8_R, LED8_G and LED8_B) 
-**      Carry gets often for large values and rarely for small values.
+**      Carry occurs often for large values and rarely for small values.
 **      Carry bit is cleared in the accumulator.
 **          
 */
@@ -61,7 +61,7 @@ void __ISR(_TIMER_5_VECTOR, ipl2) Timer5ISR(void)
     sAccG &= 0xFF;
     sAccB &= 0xFF;
     
-    IFS0bits.T5IF = 0;                  // clear interrupt flag
+    IFS0bits.T5IF = 0;     // clear interrupt flag
 }
 
 // Timer period in seconds
@@ -78,26 +78,24 @@ void __ISR(_TIMER_5_VECTOR, ipl2) Timer5ISR(void)
 **
 **	Description:
 **		This function configures the Timer5 to be used by RGBLED module.
+**      The timer will generate interrupts every 300 microseconds.
 **      The period constant is computed using TMR_TIME definition (located in this source file)
 **      and peripheral bus frequency definition (PB_FRQ, located in config.h).
 **          
 */
-void Timer5Setup()
+void RGBLED_Timer5Setup()
 {
-  INTDisableInterrupts();             // INT step 2: disable interrupts at CPU
-                                      // INT step 3: setup peripheral
-//  PR5 = 375;                        //             set period register, generates one interrupt every 300 us, for PBFreq 10 Mhz
-  PR5 = (int)(((float)(TMR_TIME * PB_FRQ) / 256) + 0.5);                        //             set period register, generates one interrupt every 300 us
-  TMR5 = 0;                           //             initialize count to 0
-  T5CONbits.TCKPS = 3;                //            1:256 prescale value
-  T5CONbits.TGATE = 0;                //             not gated input (the default)
-  T5CONbits.TCS = 0;                  //             PCBLK input (the default)
-  T5CONbits.ON = 1;                   //             turn on Timer1
-  IPC5bits.T5IP = 2;                  // INT step 4: priority
-  IPC5bits.T5IS = 0;                  //             subpriority
-  IFS0bits.T5IF = 0;                  // INT step 5: clear interrupt flag
-  IEC0bits.T5IE = 1;                  // INT step 6: enable interrupt
-  INTEnableSystemMultiVectoredInt();  // INT step 7: enable interrupts at CPU
+   PR5 = (int)(((float)(TMR_TIME * PB_FRQ) / 256) + 0.5);   //set period register, generates one interrupt every 300 us                     //             set period register, generates one interrupt every 300 us
+  TMR5 = 0;                           //    initialize count to 0
+  T5CONbits.TCKPS = 3;                //    1:256 prescaler value
+  T5CONbits.TGATE = 0;                //    not gated input (the default)
+  T5CONbits.TCS = 0;                  //    PCBLK input (the default)
+  IPC5bits.T5IP = 2;                  //    INT step 4: priority
+  IPC5bits.T5IS = 0;                  //    subpriority
+  IFS0bits.T5IF = 0;                  //    clear interrupt flag
+  IEC0bits.T5IE = 1;                  //    enable interrupt
+  T5CONbits.ON = 1;                   //    turn on Timer5
+  macro_enable_interrupts();          //    enable interrupts at CPU
 }
 
 /* ------------------------------------------------------------ */
@@ -117,14 +115,13 @@ void Timer5Setup()
 void RGBLED_Init()
 {
     RGBLED_ConfigurePins();
-    Timer5Setup();
+    RGBLED_Timer5Setup();
     lat_LED8_R = 0;
     lat_LED8_G = 0;
     lat_LED8_B = 0;
                           
     /*
-       // configure Timer2
-//    T2CONbits.TCKPS = 0;                //            1:1 prescale value
+     // configure Timer2 - for PWM usage
     T2CONbits.TCKPS = 3;                //            1:64 prescale value
     T2CONbits.TGATE = 0;                //             not gated input (the default)
     T2CONbits.TCS = 0;                  //             PCBLK input (the default)
@@ -132,19 +129,19 @@ void RGBLED_Init()
 
     PR2 = 4096;
 
-    // Configure Output Compare Module 3
+    // Configure Output Compare Module 3 - for PWM usage
    OC3CONbits.ON = 0;       // Turn off OC3 while doing setup.
    OC3CONbits.OCM = 6;      // PWM mode on OC3; Fault pin is disabled
    OC3CONbits.OCTSEL = 0;   // Timer2 is the clock source for this Output Compare module
    OC3CONbits.ON = 1;       // Start the OC3 module
    
-    // Configure Output Compare Module 4
+    // Configure Output Compare Module 4 - for PWM usage
    OC4CONbits.ON = 0;       // Turn off OC4 while doing setup.
    OC4CONbits.OCM = 6;      // PWM mode on OC4; Fault pin is disabled
    OC4CONbits.OCTSEL = 0;   // Timer2 is the clock source for this Output Compare module
    OC4CONbits.ON = 1;       // Start the OC4 module
 
-    // Configure Output Compare Module 5
+    // Configure Output Compare Module 5 - for PWM usage
    OC5CONbits.ON = 0;       // Turn off OC5 while doing setup.
    OC5CONbits.OCM = 6;      // PWM mode on OC5; Fault pin is disabled
    OC5CONbits.OCTSEL = 0;   // Timer2 is the clock source for this Output Compare module
@@ -162,25 +159,25 @@ void RGBLED_Init()
 **		
 **
 **	Description:
-**		This function configures the IO pins involved in the RGBLED module as digital output pins 
-**      
+**		This function configures the IO pins involved in the RGBLED module as digital output pins. 
+**      The function uses pin related definitions from config.h file.
+**      This is a low-level function called by RGBLED_Init(), so user should avoid calling it directly.       
 **          
 */
 void RGBLED_ConfigurePins()
 {
-//  tris_PMODS_JB2 = 0;     // output, debug  
     // Configure RGBLEDs as digital outputs.
 
-//    rp_LED8_R = 0x0B; // LED8_R RPD2 is OC3 
+//    rp_LED8_R = 0x0B; // LED8_R RPD2 is OC3 - for PWM usage
     rp_LED8_R = 0;      // no remapable
     tris_LED8_R = 0;    // output
   
     //RPD12R 1011 = OC5
-//   rp_LED8_G = 0x0B; // LED8_G RPD12 is OC5
+//   rp_LED8_G = 0x0B; // LED8_G RPD12 is OC5 - for PWM usage
     rp_LED8_G = 0;      // no remapable
     tris_LED8_G = 0;    // output
  
-//    rp_LED8_B = 0x0B; // LED8_B RPD3 is OC4
+//    rp_LED8_B = 0x0B; // LED8_B RPD3 is OC4 - for PWM usage
     rp_LED8_B = 0;      // no remapable
     tris_LED8_B = 0;    // output
     
@@ -188,6 +185,7 @@ void RGBLED_ConfigurePins()
     ansel_LED8_R = 0;
     ansel_LED8_B = 0;
 }
+
 
 /* ------------------------------------------------------------ */
 /***	RGBLED_SetValue
@@ -210,7 +208,16 @@ void RGBLED_SetValue(unsigned char bValR, unsigned char bValG, unsigned char bVa
     bColR = bValR;
     bColG = bValG;
     bColB = bValB;
+    /* - for PWM usage
+    unsigned short wValR = bValR << 4;
+    unsigned short wValG = bValG << 4;
+    unsigned short wValB = bValB << 4;
+    OC3RS = wValR;
+    OC5RS = wValG;   
+    OC4RS = wValB;
+    */
     
+
 }
 
 /* ------------------------------------------------------------ */
@@ -250,10 +257,9 @@ void RGBLED_SetValueGrouped(unsigned int uiValRGB)
 */
 void RGBLED_Close()
 {
-
     // stop the timer
-      T5CONbits.ON = 0;                   //             turn off Timer1
-  // turn off colors
+      T5CONbits.ON = 0;   // turn off Timer5
+    // turn off colors
     lat_LED8_R = 0;
     lat_LED8_G = 0;
     lat_LED8_B = 0;

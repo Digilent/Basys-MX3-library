@@ -57,7 +57,7 @@ int main(int argc, char** argv)
 **      The Init functions for each module are called and bit and group specific functions are used
 **          
 */
-BasicIODemo(){
+void BasicIODemo(){
     //libraries initialization for the used IO modules
     LCD_Init(); 
     LED_Init(); 

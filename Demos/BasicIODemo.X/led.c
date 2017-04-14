@@ -10,6 +10,7 @@
   @Description
         This file groups the functions that implement the LED library.
         The functions implement basic digital output functionality.
+        The library also provides a set of fast access SetValue function macros, one for each LED, defined in led.h.
         Include the file in the project, together with config.h, when this library is needed.
  
   @Author
@@ -39,9 +40,10 @@
 **		
 **
 **	Description:
-**		This function initializes the hardware involved in the LED module: 
-**      the pins corresponding to LEDs are initialized as digital outputs.
-**          
+**		This function initializes the hardware involved in the LED module. 
+**      The pins corresponding to LEDs are initialized as digital outputs.
+**      All the LEDs are turned off.
+** 
 */
 void LED_Init()
 {
@@ -59,7 +61,9 @@ void LED_Init()
 **		
 **
 **	Description:
-**		This function configures the IO pins involved in the LED module as digital output pins 
+**		This function configures the IO pins involved in the LED module as digital output pins. 
+**      The function uses pin related definitions from config.h file.
+**      This is a low-level function called by LED_Init(), so user should avoid calling it directly.
 **      
 **          
 */
@@ -82,40 +86,42 @@ void LED_ConfigurePins()
 **		
 **
 **	Description:
-**		This function sets the value to the LED specified by bNo to the value specified by bVal. 
-**      If the value provided for bNo is not between 0 and 7, only the LSB 3 bits will be considered.
+**		This function sets the LED specified by bNo to the value specified by bVal. 
+**      If the value provided for bNo is not between 0 and 7, the function does nothing.
 **          
 */
 void LED_SetValue(unsigned char bNo, unsigned char bVal)
 {
     bVal = bVal ? 1: 0;
-    bNo &= 0x07;    // cast the value to 0-7
-    switch (bNo)
+    if(bNo == (bNo & 0x07))
     {
-        case 0:
-            LEDS_Led0SetValue(bVal);
-            break;
-        case 1:
-            LEDS_Led1SetValue(bVal);
-            break;
-        case 2:
-            LEDS_Led2SetValue(bVal);
-            break;
-        case 3:
-            LEDS_Led3SetValue(bVal);
-            break;
-        case 4:
-            LEDS_Led4SetValue(bVal);
-            break;
-        case 5:
-            LEDS_Led5SetValue(bVal);
-            break;
-        case 6:
-            LEDS_Led6SetValue(bVal);
-            break;
-        case 7:
-            LEDS_Led7SetValue(bVal);
-            break;
+        switch (bNo)
+        {
+            case 0:
+                LEDS_Led0SetValue(bVal);
+                break;
+            case 1:
+                LEDS_Led1SetValue(bVal);
+                break;
+            case 2:
+                LEDS_Led2SetValue(bVal);
+                break;
+            case 3:
+                LEDS_Led3SetValue(bVal);
+                break;
+            case 4:
+                LEDS_Led4SetValue(bVal);
+                break;
+            case 5:
+                LEDS_Led5SetValue(bVal);
+                break;
+            case 6:
+                LEDS_Led6SetValue(bVal);
+                break;
+            case 7:
+                LEDS_Led7SetValue(bVal);
+                break;
+        }
     }
 }
 
@@ -124,20 +130,22 @@ void LED_SetValue(unsigned char bNo, unsigned char bVal)
 /***	LED_ToggleValue
 **
 **	Parameters:
-**		unsigned char bNo   - the number of led whose value will be toggled. The value must be between 0 and 7.
+**		unsigned char bNo   - the led whose value will be toggled. The value must be between 0 and 7.
 **
 **	Return Value:
 **		
 **
 **	Description:
 **		This function toggles the value of the LED specified by bNo.  If the LED was off, it is turned on. If the LED was on, it is tuned off. 
-**      If the value provided for bNo is not between 0 and 7, only the LSB 3 bits will be considered.
+**      If the value provided for bNo is not between 0 and 7, the function does nothing.
 **          
 */
 void LED_ToggleValue(unsigned char bNo)
 {
-    bNo &= 0x07;    // cast the value to 0-7
-    latinv_LEDS_GRP = (1<<bNo);
+    if(bNo == (bNo & 0x07))
+    {
+        latinv_LEDS_GRP = (1<<bNo);
+    }
 }
 
 /* ------------------------------------------------------------ */
@@ -154,7 +162,7 @@ void LED_ToggleValue(unsigned char bNo)
 **
 **	Description:
 **		This function sets the value for all 8 LEDs, according to the value provided in bVal.  
-**      Each bit from bVal corresponds to a LED: Bit 0 (LSB) corresponds to LD0, bit 7 (MSB) corresponds to LD7.
+**      Each bit from bVal corresponds to an LED: Bit 0 (LSB) corresponds to LD0, bit 7 (MSB) corresponds to LD7.
 **          
 */
 void LED_SetGroupValue(unsigned char bVal)

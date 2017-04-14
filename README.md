@@ -41,8 +41,6 @@ Demos that use each of the libraries are found in the Demos folder. They are pro
 
 ## Known Issues
 
-* SPIFLASH library sometimes doesn't work well for writing large pages. It always works correctly for 1 byte write.
-* MOT library (for motors) shares the same Timer with the AUDIO library. They shouldn’t be used together.
 * With some versions of Microchip XC32 compiler (1.41, for example) there are some errors related to INTDisableInterrupts and INTEnableSystemMultiVectoredInt. We recommend XC32 version 1.31. 
 
 
