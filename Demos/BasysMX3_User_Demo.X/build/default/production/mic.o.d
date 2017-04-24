@@ -1,4 +1,5 @@
 build/default/production/mic.o:  \
 mic.c  \
 adc.h  \
-mic.h 
+mic.h  \
+config.h 

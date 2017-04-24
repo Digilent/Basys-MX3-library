@@ -70,7 +70,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PK3OBPlatformTool</platformTool>
         <languageToolchain>XC32</languageToolchain>
-        <languageToolchainVersion>1.40</languageToolchainVersion>
+        <languageToolchainVersion>1.43</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>

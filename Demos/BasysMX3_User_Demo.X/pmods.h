@@ -2,16 +2,16 @@
 /** Descriptive File Name
 
   @Company
-    Company Name
+    Digilent
 
   @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
+    pmods.h
 
   @Description
-    Describe the purpose of this file.
+     This file groups the declarations of the functions that implement
+        the Pmods library (defined in pmods.c).
+        Include the file in the project when this library is needed.
+        Use #include "pmods.h" in the source files where the functions are needed.
  */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 void PMODS_InitPin(unsigned char bPmod, unsigned char bPos, unsigned char bDir, unsigned char pullup, unsigned char pulldown);
 unsigned char PMODS_GetValue(unsigned char bPmod, unsigned char bPos);
 void PMODS_SetValue(unsigned char bPmod, unsigned char bPos, unsigned char bVal);
-
+void PMODS_SetGroupValue(unsigned char bPmod, unsigned char bVal);
 #endif /* _PMODS_H */
 
 /* *****************************************************************************

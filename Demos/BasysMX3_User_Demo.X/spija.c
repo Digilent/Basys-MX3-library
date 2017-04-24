@@ -2,16 +2,25 @@
 /** Descriptive File Name
 
   @Company
-    Company Name
+    Digilent
 
   @File Name
-    filename.c
-
-  @Summary
-    Brief description of the file.
+    spija.c
 
   @Description
-    Describe the purpose of this file.
+        This file groups the functions that implement the SPIJA library.
+        The library implements SPI2 access over pins on PMODA connector (JA).
+        SPIJA_CE   ->   JA1 (RC2)
+        SPIJA_SI   ->   JA2 (RC1)
+        SPIJA_SO   ->   JA3 (RC4)
+        SPIJA_SCK  ->   JA4 (RG6)
+        
+        Include the file in the project, together with config.h, when this library is needed.	
+
+  @Author
+    Cristian Fatu 
+    cristian.fatu@digilent.ro
+  
  */
 /* ************************************************************************** */
 
@@ -25,29 +34,85 @@
 #include "spija.h"
 
 /* ************************************************************************** */
-
-void SPIJA_ConfigureSPI()
-{
-    SPI2BRG = 10;
-    // configures SPI2
-    SPI2CONbits.CKP = 0;    // Clock Polarity
-    SPI2CONbits.SMP = 0;    // SPI Data Input Sample Phase 
-    SPI2CONbits.MSTEN = 1;  // Master
-    SPI2CONbits.MODE16 = 0; // 8 bit transfer
-    SPI2CONbits.MODE32 = 0; // 8 bit transfer
-    SPI2CON2bits.AUDEN = 0; // Audio protocol is disabled
-    SPI2CONbits.ON = 1; // enable SPI
-    
-
- //   SPI2CON=0x8220; // SPI ON, 8 bits transfer, SMP=1, Master mode
-}
-
+/***	SPIJA_Init
+**
+**	Parameters:
+**		
+**
+**	Return Value:
+**		
+**
+**	Description:
+**		This function initializes the hardware involved in the SPIJA module: 
+**      The following digital pins are configured as digital outputs: SPIJA_CE (JA1), SPIJA_SCK(JA2), SPIJA_SI(JA3)
+**      The following digital pins are configured as digital inputs: SPIJA_SO(JA4).
+**      The SPIJA_SI and SPIJA_SO are mapped over the SPI2 interface.
+**      The SPI2 module of PIC32 is configured to work at 1 Mhz, polarity 0 and edge 1.
+**      
+**          
+*/
 void SPIJA_Init()
 {
     SPIJA_ConfigurePins();
-    SPIJA_ConfigureSPI();
+    SPIJA_ConfigureSPI(1000000, 0, 1); // configures SPI to work at 1 Mhz, polarity 0 and edge 1.
 }
 
+/* ************************************************************************** */
+/***	SPIJA_ConfigureSPI
+**
+**	Parameters:
+**		unsigned int spiFreq - SPI clock frequency (Hz).
+**                                     for example 1000000 corresponds to 1 MHz
+**		unsigned char pol - SPI Clock Polarity, similar to CKP field of SPIxCON
+**                  1 = Idle state for clock is a high level; active state is a low level
+**                  0 = Idle state for clock is a low level; active state is a high level
+**		unsigned char edge - SPI Clock Edge, similar to CKE field of SPIxCON
+**                  1 = Serial output data changes on transition from active clock state to Idle clock state (see CKP bit)
+**                  0 = Serial output data changes on transition from Idle clock state to active clock state (see CKP bit)
+**
+**	Return Value:
+**		
+**
+**	Description:
+**		This function configures the SPI2 hardware interface of PIC32, according to the provided parameters.
+**      In order to compute the baud rate value, it uses the peripheral bus frequency definition (PB_FRQ, located in config.h)
+**      This is a low-level function called by initialization functions, so user should avoid calling it directly.
+**      
+**          
+*/
+void SPIJA_ConfigureSPI(unsigned int spiFreq, unsigned char pol, unsigned char edge)
+{
+    SPI2BRG = PB_FRQ / (2 * spiFreq) - 1;
+    // configures SPI2
+    SPI2CONbits.CKP = pol;    // SPI Clock Polarity
+    SPI2CONbits.CKE = edge;   // SPI Clock Edge    
+    SPI2CONbits.SMP = 0;      // SPI Data Input Sample Phase 
+    SPI2CONbits.MSTEN = 1;    // Master
+    SPI2CONbits.MODE16 = 0;   // 8 bit transfer
+    SPI2CONbits.MODE32 = 0;   // 8 bit transfer
+    SPI2CON2bits.AUDEN = 0;   // Audio protocol is disabled
+    SPI2CONbits.ON = 1;       // enable SPI
+}
+
+/* ************************************************************************** */
+/***	SPIJA_ConfigurePins
+**
+**	Parameters:
+**		
+**
+**	Return Value:
+**		
+**
+**	Description:
+**		This function configures the digital pins involved in the SPIJA module: 
+**      The following digital pins are configured as digital outputs: SPIJA_CE (JA1), SPIJA_SCK(JA2), SPIJA_SI(JA3)
+**      The following digital pins are configured as digital inputs: SPIJA_SO(JA4).
+**      The SPIJA_SI and SPIJA_SO are mapped over the SPI2 interface.
+**      The function uses pin related definitions from config.h file.
+**      This is a low-level function called by SPIJA_Init(), so user should avoid calling it directly.     
+**      
+**          
+*/
 void SPIJA_ConfigurePins()
 {
     // Configure SPIJA signals as digital outputs.
@@ -68,36 +133,80 @@ void SPIJA_ConfigurePins()
     RPG6R = 0;
     CM1CONbits.ON = 0;
 }
-//void inline SPIJA_WaitForDataByte()
-//{
-//    while(!SPI2STATbits.SPITBE);	// wait for RX buffer to fill 
-////    while(!SPI2STATbits.SPIRBF);	// wait for RX buffer to fill 
-////    while((SPI2STATbits.SPITBF == 1) || (SPI2STATbits.SPIRBF == 0));
-//}
-void SPIJA_WriteByte(unsigned char bData)
+
+/* ************************************************************************** */
+/***	SPIJA_RawTransferByte
+**
+**	Parameters:
+**		unsigned char bVal  - the byte to be transmitted over SPI
+**
+**	Return Value:
+**		unsigned char       - the byte received over SPI	
+**
+**	Description:
+**		This function implements basic byte transfer over SPI2. 
+**      It transmits the parameter bVal and returns the received byte.
+**      This function does not handle Slave Select (SPIJA_CE) pin. 
+**      This is a low-level function called by SPIJA_TransferBytes(), so user should avoid calling it directly.     
+ **          
+*/
+unsigned char SPIJA_RawTransferByte(unsigned char bVal)
 {
-    lat_SPIJA_CE = 0; // Activate CS
     while(!SPI2STATbits.SPITBE);	// wait for TX buffer to be empty
-    SPI2BUF = bData;
-    while(!SPI2STATbits.SPIRBF);	// wait for TX buffer to be empty
-//    SPIJA_WaitForDataByte();
-//    DelayAprox10Us(1);
-    lat_SPIJA_CE = 1; // Deactivate CS
+    SPI2BUF = bVal;
+    while(!SPI2STATbits.SPIRBF);	// wait for RX buffer to be empty
+    return SPI2BUF;
 }
 
-void SPIJA_TrasferBytes(int nBytes, unsigned char *pbRdData, unsigned char *pbWrData)
+/* ************************************************************************** */
+/***	SPIJA_TransferBytes
+**
+**	Parameters:
+**      int bytesNumber         - Number of bytes to be transfered.
+**      unsigned char *pbRdData - Pointer to a buffer storing the received bytes.
+**      unsigned char *pbWrData - Pointer to a buffer storing the bytes to be transmitted.
+**
+**	Return Value:
+**
+**	Description:
+**		This function implements transfer of a number of bytes over SPI2. 
+**      It transmits the bytes from pbWrData and receives the bytes in pbRdData.
+**      This function properly handles Slave Select (SPIJA_CE) pin.
+**      
+**          
+*/
+void SPIJA_TransferBytes(int bytesNumber, unsigned char *pbRdData, unsigned char *pbWrData)
 {
     int i;
-    lat_SPIJA_CE = 0; // Activate CS
-    for(i = 0; i< nBytes; i++)
+    lat_SPIJA_CE = 0; // Activate SS
+    for(i = 0; i< bytesNumber; i++)
     {
-        while(!SPI2STATbits.SPITBE);	// wait for TX buffer to be empty
-        SPI2BUF = pbWrData[i];
-        while(!SPI2STATbits.SPIRBF);	// wait for TX buffer to be empty
-        pbRdData[i] = SPI2BUF;
+        pbRdData[i] = SPIJA_RawTransferByte(pbWrData[i]);
     }
-    lat_SPIJA_CE = 1; // Deactivate CS
+    lat_SPIJA_CE = 1; // Deactivate SS
 }
+
+/* ************************************************************************** */
+/***	SPIJA_Close
+**
+**	Parameters:
+** 
+**
+**	Return Value:
+**      
+**
+**	Description:
+**		This functions releases the hardware involved in SPIJA library: 
+**      it turns off the SPI2 interface.
+**      
+**          
+*/
+void SPIJA_Close()
+{
+    SPI2CONbits.ON = 0; // disable SPI
+}
+
+
 /* *****************************************************************************
  End of File
  */

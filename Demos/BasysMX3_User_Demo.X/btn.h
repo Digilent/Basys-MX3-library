@@ -2,16 +2,16 @@
 /** Descriptive File Name
 
   @Company
-    Company Name
+    Digilent
 
   @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
+    btn.h
 
   @Description
-    Describe the purpose of this file.
+        This file groups the declarations of the functions that implement
+        the BTN library (defined in btn.c).
+        Include the file in the project when this library is needed.
+        Use #include "btn.h" in the source files where the functions are needed.
  */
 /* ************************************************************************** */
 
@@ -19,10 +19,12 @@
 #define _BTN_H
 
 void BTN_Init();
-void BTN_ConfigurePins();
 void BTN_InitChangeNotification();
 unsigned char BTN_GetValue(unsigned char btn);
 unsigned char BTN_GetGroupValue();
+
+//private functions:
+void BTN_ConfigurePins();
 
 #endif /* _BTN_H */
 

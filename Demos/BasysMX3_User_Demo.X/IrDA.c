@@ -2,16 +2,21 @@
 /** Descriptive File Name
 
   @Company
-    Company Name
+    Digilent
 
   @File Name
-    filename.c
-
-  @Summary
-    Brief description of the file.
+    IrDA.c
 
   @Description
-    Describe the purpose of this file.
+        This file groups the functions that implement the IRDA library.
+        The library implements the control of IRDA module. It also provides the UART5
+        interface over the IRDA transmit and receive pins.
+        So, in order to send a byte over IRDA, the byte is transmitted over UART5, 
+        thus it serializes each bit to be transmitted over IRDA. Receiving bits from IRDA are accumulated in a byte in UART5 receive buffer.
+        Include the file together with utils.c and utils.h in the project when this library is needed.	
+
+  @Author
+    Cristian Ignat 
  */
 /* ************************************************************************** */
 
@@ -26,41 +31,107 @@
 
 /* ************************************************************************** */
 
-
-void IRDA_Init()
+/* ------------------------------------------------------------ */
+/***	IRDA_Init
+**
+**	Parameters:
+**          unsigned int baud - the baud rate for the UART interface
+**
+**	Return Value:
+**		
+**
+**	Description:
+**		This function initializes the hardware involved in the IRDA module: 
+**      The following digital pins are configured as digital outputs: IRDA_PDOWN, IRDA_TX.
+**      The following digital pins are configured as digital inputs: IRDA_RX.
+**      IRDA module is set in SMIR mode.
+**      The IRDA_TX and IRDA_RX are mapped over UART5 interface, which is configured
+**      to work at the specified baud.
+**          
+*/
+void IRDA_Init(unsigned int baud)
 {
-    // Configure SWTs as digital inputs.
+    IRDA_ConfigurePins();
+    IRDA_Set_SMIR_Mode();   
+    IRDA_ConfigureIRDAOverUART5(baud);
+}
+
+
+/* ------------------------------------------------------------ */
+/***	IRDA_ConfigurePins
+**
+**	Parameters:
+**		
+**
+**	Return Value:
+**		
+**
+**	Description:
+**		This function configures the digital pins involved in the IRDA module: 
+**      The following digital pins are configured as digital outputs: IRDA_PDOWN, IRDA_TX.
+**      The following digital pins are configured as digital inputs: IRDA_RX.
+**      The function uses pin related definitions from config.h file.
+**      This is a low-level function called by IRDA_Init(), so user should avoid calling it directly.
+**               
+*/
+void IRDA_ConfigurePins()
+{
+    // Configure IRDA_PDOWN and IRDA_TX as digital outputs.
     tris_IRDA_PDOWN = 0;
-    tris_IRDA_RX = 1;
     tris_IRDA_TX = 0;
 
+    // Configure IRDA_RX as digital inputs.
+    tris_IRDA_RX = 1;
+    
     // disable analog (set pins as digital))
     ansel_IRDA_RX = 0;
     ansel_IRDA_TX = 0;
-    
-    IRDA_set_SMIR_mode();
-//    IRDA_set_FIR_mode();
-    
-    // set the external interrupt 1 for RX pin
-//    INT1R = 0x05;           //0b0101 <=> RPB6
-    IRDA_ConfigureIRDAOverUART5();
 }
 
-void IRDA_set_FIR_mode()
+/* ------------------------------------------------------------ */
+/***	IRDA_Set_FIR_Mode
+**
+**	Parameters:
+**          
+**
+**	Return Value:
+**		
+**
+**	Description:
+**		This function configures the IRDA module to work in FIR mode.
+**          
+*/
+void IRDA_Set_FIR_Mode()
 {
     DelayAprox10Us(1);
+    
     IRDA_PDOWN = 1;
     DelayAprox10Us(1);
+    
     IRDA_TX = 1;
     DelayAprox10Us(1);
     
     IRDA_PDOWN = 0;
     DelayAprox10Us(1);
+    
     IRDA_TX = 0;
     DelayAprox10Us(1);
 }
 
-void IRDA_set_SMIR_mode()
+/* ------------------------------------------------------------ */
+/***	IRDA_Set_SMIR_Mode
+**
+**	Parameters:
+**          
+**
+**	Return Value:
+**		
+**
+**	Description:
+**		This function configures the IRDA module to work in FIR mode.
+**          
+*/
+void IRDA_Set_SMIR_Mode()
 {
     DelayAprox10Us(1);
     
@@ -75,19 +146,33 @@ void IRDA_set_SMIR_mode()
 }
 
 
-
-void IRDA_ConfigureIRDAOverUART5()
+/* ------------------------------------------------------------ */
+/***	IRDA_ConfigureIRDAOverUART5
+**
+**	Parameters:
+**          unsigned int baud - the baud rate for the UART interface
+**                              for example 9600 corresponds to 9600 baud.
+**
+**	Return Value:
+**		
+**
+**	Description:
+**		This function initializes the UART5 to work in conjuction with IRDA module. 
+**      The IRDA_TX and IRDA_RX are mapped over UART5 interface pins.
+**      UART5 is configured to work at the specified baud rate
+**      In order to compute the baud rate value, it uses the peripheral bus frequency definition (PB_FRQ, located in config.h)
+**          
+*/
+void IRDA_ConfigureIRDAOverUART5(unsigned int baud)
 {
-    // IRDA RX will be connected to 
-    // configure IR_RX (B6) -> U5RX
+    // IRDA RX will be connected to U5RX 
+    // configure IR_RX (RB6) -> U5RX
     U5RXR = 5; //0101 = RPB6
     
-    // configure IR_TX (B7) -> U5TX
+    // IRDA TX will be connected to U5TX 
+    //configure IR_TX (RB7) -> U5TX
     RPB7R = 4; //0100 = U5TX
-    
-    
     // configure UART5
-    // 9600 baud, PBFreq = 80MHz
     U5MODEbits.ON     = 0;
     U5MODEbits.SIDL   = 0;
     U5MODEbits.RTSMD  = 0;
@@ -102,7 +187,8 @@ void IRDA_ConfigureIRDAOverUART5()
     U5MODEbits.PDSEL0 = 0; 
     U5MODEbits.STSEL  = 0;  
 
-    U5BRG = 519;         // BAUDRATE = 80MHz/16/9600-1 = 0d259  Ś9600BPS(40MHz)
+
+    U5BRG = (int)(((float)PB_FRQ/(16*baud) - 1) + 0.5); // add 0.5 just in order to implement the round using the floor approach
 
 
     U5MODEbits.ON      = 1; 
@@ -110,16 +196,53 @@ void IRDA_ConfigureIRDAOverUART5()
     U5STAbits.URXEN    = 1;    
 
     // IRDA related
-    U5MODEbits.IREN   = 1; // IrDA Encoder and Decoder Enable bit: 1 = IrDA is enabled
-    U5STAbits.UTXINV   = 1;    // Transmit Polarity Inversion bit: 1 = IrDA encoded UxTX Idle state is ‘1’
+    U5MODEbits.IREN   = 1;     // IrDA Encoder and Decoder Enable bit: 1 = IrDA is enabled
+    U5STAbits.UTXINV   = 1;    // Transmit Polarity Inversion bit: 1 = IrDA encoded UxTX Idle state is "1"
 }
 
+/* ------------------------------------------------------------ */
+/***	IRDA_UARTPutChar
+**
+**	Parameters:
+**          char ch -   the character to be transmitted over IRDA.
+**
+**	Return Value:
+**		
+**
+**	Description:
+**		This function transmits a character over IRDA, by transmitting it over UART5. 
+**      
+**          
+*/
 void IRDA_UARTPutChar(char ch)
 {
     while(U5STAbits.UTXBF == 1);
     U5TXREG = ch;
 }
 
+/* ------------------------------------------------------------ */
+/***	IRDA_UART_GetChar
+**
+**  Synopsis:
+ **      irda_rx_val = IRDA_UART_GetChar(60000, &rx_err);
+**	Parameters:
+**      unsigned int timeout    - the number of times to check for an available received byte
+**      char *error             - pointer to a value that returns the error status
+**                                      0 - no timeout
+**                                      1 - timeout
+**
+**	Return Value:
+**          - unsigned char - the byte received over IRDA, by receiving it from UART5
+**		
+**
+**	Description:
+**		This function receives a character over IRDA. 
+ *      It waits until a byte is received over UART5. 
+**      Then, it returns the byte.
+**      When after a number of times (specified by timeout parameter) no value is available on UART5, 
+**      timeout condition is met: *error parameter will return 1 (otherwise it returns 0).
+**          
+*/
 unsigned char IRDA_UART_GetChar(unsigned int timeout, char *error) 
 {
     unsigned int timeout_cnt = 0;
@@ -143,15 +266,54 @@ unsigned char IRDA_UART_GetChar(unsigned int timeout, char *error)
     return U5RXREG;
 }
 
+/* ------------------------------------------------------------ */
+/***	IRDA_UART_AvaliableRx
+**
+**	Parameters:
+**          
+**
+**	Return Value:
+**          - unsigned char - Receive Buffer Data Available bit on UART5 
+                    1 = Receive buffer has data, at least one more character can be read
+                    0 = Receive buffer is empty
+**		
+**
+**	Description:
+**		This function returns UART5 Receive Buffer Data Available bit.
+**      It returns 1 if the receive buffer has data (at least one more character can be read).
+**      It returns 0 if the receive buffer is empty.
+**      
+**          
+*/
 unsigned char IRDA_UART_AvaliableRx()
 {
     return U5STAbits.URXDA;
+}
+
+/* ------------------------------------------------------------ */
+/***	IRDA_Close
+**
+**	Parameters:
+** 
+**
+**	Return Value:
+**      
+**
+**	Description:
+**		This functions releases the hardware involved in IRDA library: 
+**      it turns off the UART5 interface.
+**      
+**          
+*/
+void IRDA_Close()
+{
+      U5MODEbits.ON = 0;   
 }
 /* *****************************************************************************
  End of File
  */
 
- /*
+ /* This is a demo of IRRDA usage
 const unsigned char irda_tx_values[] = {0xaa, 0x83, 0x27, 0x16, 0xf5, 0x6e, 0xb2, 0x9a};
 int main(int argc, char** argv) 
 {

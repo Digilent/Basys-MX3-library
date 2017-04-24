@@ -7,6 +7,24 @@
 
 #ifndef CONFIG_H
 #define	CONFIG_H
+
+#define PB_FRQ  40000000
+
+#define macro_enable_interrupts() \
+{  unsigned int val = 0;\
+    asm volatile("mfc0 %0,$13":"=r"(val));  \
+    val |= 0x00800000;  \
+    asm volatile("mtc0 %0,$13" : "+r"(val)); \
+    INTCONbits.MVEC = 1; \
+__builtin_enable_interrupts(); }
+
+//#define macro_enable_interrupts INTEnableSystemMultiVectoredInt()
+
+#define macro_disable_interrupts __builtin_disable_interrupts()
+//#define macro_disable_interrupts INTDisableInterrupts()
+
+
+
 /*
 #ifdef	__cplusplus
 extern "C" {
@@ -21,28 +39,13 @@ extern "C" {
 #define  lat_LEDS_GRP_ADDR   0xBF886030
 
 #define  lat_LEDS_LED0  LATAbits.LATA0
-#define LEDS_Led0SetValue(val) lat_LEDS_LED0 = val
-
 #define  lat_LEDS_LED1  LATAbits.LATA1
-#define LEDS_Led1SetValue(val) lat_LEDS_LED1 = val
-
 #define  lat_LEDS_LED2  LATAbits.LATA2
-#define LEDS_Led2SetValue(val) lat_LEDS_LED2 = val
-
 #define  lat_LEDS_LED3  LATAbits.LATA3
-#define LEDS_Led3SetValue(val) lat_LEDS_LED3 = val
-
 #define  lat_LEDS_LED4  LATAbits.LATA4
-#define LEDS_Led4SetValue(val) lat_LEDS_LED4 = val
-
 #define  lat_LEDS_LED5  LATAbits.LATA5
-#define LEDS_Led5SetValue(val) lat_LEDS_LED5 = val
-
 #define  lat_LEDS_LED6  LATAbits.LATA6
-#define LEDS_Led6SetValue(val) lat_LEDS_LED6 = val
-
 #define  lat_LEDS_LED7  LATAbits.LATA7
-#define LEDS_Led7SetValue(val) lat_LEDS_LED7 = val
 
 // SWT
 
@@ -153,12 +156,6 @@ extern "C" {
 #define ansel_LCD_DISP_RS   ANSELBbits.ANSB15
 #define rp_LCD_DISP_RS      RPB15R
 
-/*
-#define tris_LCD_DISP_RS    TRISDbits.TRISD12
-#define lat_LCD_DISP_RS     LATDbits.LATD12
-#define ansel_LCD_DISP_RS   ANSELDbits.ANSD12
-#define rp_LCD_DISP_RS      RPD12R
-*/
 
 #define tris_LCD_DISP_RW    TRISDbits.TRISD5
 #define  lat_LCD_DISP_RW    LATDbits.LATD5
@@ -173,6 +170,12 @@ extern "C" {
 #define prt_LCD_DATA        PORTE
 #define msk_LCD_DATA        0xFF
 #define  lat_LCD_DATA_ADDR   0xBF886440
+#define ansel_LCD_DB2        ANSELEbits.ANSE2
+#define ansel_LCD_DB4        ANSELEbits.ANSE4
+#define ansel_LCD_DB5        ANSELEbits.ANSE5
+#define ansel_LCD_DB6        ANSELEbits.ANSE6
+#define ansel_LCD_DB7        ANSELEbits.ANSE7
+
 
 // RGBLED
 #define tris_LED8_R         TRISDbits.TRISD2
@@ -194,11 +197,11 @@ extern "C" {
 
 #define tris_SPIFLASH_CE    TRISFbits.TRISF8
 #define  lat_SPIFLASH_CE    LATFbits.LATF8
-//#define rp_SPIFLASH_CE      RPF8R
+
 
 #define tris_SPIFLASH_SCK   TRISFbits.TRISF6
 #define  lat_SPIFLASH_SCK   LATFbits.LATF6
-//#define   rp_SPIFLASH_SCK   RPF6R
+
 
 
 #define tris_SPIFLASH_SO   TRISFbits.TRISF7
@@ -207,24 +210,6 @@ extern "C" {
 #define tris_SPIFLASH_SI   TRISFbits.TRISF2
 #define   rp_SPIFLASH_SI   RPF2R
 
-// SPI on JA - corresponds to SPI1
-
-// - 5V tol
-#define tris_SPIJA_CE    TRISFbits.TRISF8
-#define  lat_SPIJA_CE    LATFbits.LATF8
-
-// - 5V tol
-#define tris_SPIJA_SI   TRISCbits.TRISC1 // JA2 - RC1
-#define   rp_SPIJA_SI   RPC1R
-
-// - 5V tol
-#define tris_SPIJA_SO   TRISCbits.TRISC4
-#define   rp_SPIJA_SO   SDI2R
-
-
-#define tris_SPIJA_SCK   TRISGbits.TRISG6
-#define  lat_SPIJA_SCK   LATGbits.LATG6
-#define ansel_SPIJA_SCK  ANSELGbits.ANSG6
 
 
 
@@ -263,6 +248,15 @@ extern "C" {
 #define ansel_MOT_BIN2  ANSELBbits.ANSB5
 #define rp_MOT_BIN2     RPB5R
 
+// servo 
+#define tris_SRV_S0PWM   TRISBbits.TRISB8
+#define lat_SRV_S0PWM    LATBbits.LATB8
+#define ansel_SRV_S0PWM  ANSELBbits.ANSB8
+#define rp_SRV_S0PWM     RPB8R
+
+#define tris_SRV_S1PWM   TRISAbits.TRISA15
+#define lat_SRV_S1PWM    LATAbits.LATA15
+#define rp_SRV_S1PWM     RPA15R
 
 // ACL
 #define tris_ACL_INT2   TRISGbits.TRISG0
@@ -275,6 +269,13 @@ extern "C" {
 
 #define tris_UART_RX   TRISFbits.TRISF13 
 #define   rp_UART_RX   U4RXR
+
+// UARTJB - over JB2 and JB3
+#define tris_UARTJB_TX   TRISDbits.TRISD11 
+#define   rp_UARTJB_TX   RPD11R
+
+#define tris_UARTJB_RX   TRISDbits.TRISD10 
+#define   rp_UARTJB_RX   U1RXR
 
 
 // JA
@@ -416,9 +417,29 @@ extern "C" {
 #define cnpu_PMODS_JB10   CNPUCbits.CNPUC13
 #define cnpd_PMODS_JB10   CNPDCbits.CNPDC13
 
+// SPI on JA - corresponds to SPI1
+
+// - 5V tol
+#define tris_SPIJA_CE    tris_PMODS_JA1
+#define  lat_SPIJA_CE    lat_PMODS_JA1
+
+// - 5V tol
+#define tris_SPIJA_SI   tris_PMODS_JA2 // JA2 - RC1
+#define   rp_SPIJA_SI   RPC1R
+
+// - 5V tol
+#define tris_SPIJA_SO   tris_PMODS_JA3 
+#define   rp_SPIJA_SO   SDI2R
+
+
+#define tris_SPIJA_SCK   tris_PMODS_JA4
+#define  lat_SPIJA_SCK   lat_PMODS_JA4
+#define ansel_SPIJA_SCK  ansel_PMODS_JA4
+
+
 // Analog input AN2
 #define tris_ADC_AN2    TRISBbits.TRISB2
-#define ansel_ADC_AN2  ANSELBbits.ANSB2
+#define ansel_ADC_AN2   ANSELBbits.ANSB2
 
 
 // IrDA

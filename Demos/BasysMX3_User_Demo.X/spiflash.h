@@ -2,27 +2,29 @@
 /** Descriptive File Name
 
   @Company
-    Company Name
+    Digilent
 
   @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
+    spiflash.h
 
   @Description
-    Describe the purpose of this file.
+        This file groups the declarations of the functions that implement
+        the SPIFLASH library (defined in spiflash.c).
+        Include the file in the project when this library is needed.
+        Use #include "spiflash.h" in the source files where the functions are needed.
  */
 /* ************************************************************************** */
 
 #ifndef _SPIFLASH_H    /* Guard against multiple inclusion */
 #define _SPIFLASH_H
 
+//#define SPIFLASH_SIZE 0x400000
+#define SPIFLASH_PAGE_MAX_SIZE 256
+#define SPIFLASH_SECTOR_SIZE 4096
+#define SPIFLASH_SIZE (1024*SPIFLASH_SECTOR_SIZE)
+
 void SPIFLASH_Init();
-void SPIFLASH_ConfigureSPI();
-void SPIFLASH_ConfigurePins();
-unsigned char SPIFLASH_TransferByte(unsigned char bVal);
-void SPIFLASH_TransferBytes(int nBytes, unsigned char *pbRdData, unsigned char *pbWrData);
+void SPIFLASH_ConfigureSPI(unsigned int spiFreq, unsigned char pol, unsigned char edge);
 void SPIFLASH_SendOneByteCmd(unsigned char bCmd);
 
 unsigned char SPIFLASH_ReleasePowerDownGetDeviceID();
@@ -40,6 +42,13 @@ void SPIFLASH_ProgramPage(unsigned int addr, unsigned char *pBuf, unsigned int l
 
 void SPIFLASH_Read(unsigned int addr, unsigned char *pBuf, unsigned int len);
 
+void SPIFLASH_Close();
+
+// private
+
+void SPIFLASH_ConfigurePins();
+unsigned char SPIFLASH_TransferByte(unsigned char bVal);
+void SPIFLASH_TransferBytes(unsigned char bytesNumber, unsigned char *pbRdData, unsigned char *pbWrData);
 
 
 //#ifdef __cplusplus

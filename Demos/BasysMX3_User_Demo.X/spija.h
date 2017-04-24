@@ -2,16 +2,16 @@
 /** Descriptive File Name
 
   @Company
-    Company Name
+    Digilent
 
   @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
+    spija.h
 
   @Description
-    Describe the purpose of this file.
+        This file groups the declarations of the functions that implement
+        the SPIFLASH library (defined in spija.c).
+        Include the file in the project when this library is needed.
+        Use #include "spija.h" in the source files where the functions are needed.
  */
 /* ************************************************************************** */
 
@@ -19,11 +19,15 @@
 #define _SPIJA_H
 
 void SPIJA_Init();
+
+void SPIJA_ConfigureSPI(unsigned int spiFreq, unsigned char pol, unsigned char edge);
+unsigned char SPIJA_TransferByte(unsigned char bVal);
+void SPIJA_TransferBytes(int bytesNumber, unsigned char *pbRdData, unsigned char *pbWrData);
+void SPIJA_Close();
+
+//private functions
 void SPIJA_ConfigurePins();
-void SPIFA_ConfigureSPI();
-void SPIJA_WriteByte(unsigned char bData);
-//void inline SPIJA_WaitForDataByte();
-void SPIJA_TrasferBytes(int nBytes, unsigned char *pbRdData, unsigned char *pbWrData);
+
 //#ifdef __cplusplus
 //extern "C" {
 //#endif

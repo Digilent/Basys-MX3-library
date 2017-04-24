@@ -2,37 +2,40 @@
 /** Descriptive File Name
 
   @Company
-    Company Name
+    Digilent
 
   @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
+    uart.h
 
   @Description
-    Describe the purpose of this file.
+        This file groups the declarations of the functions that implement
+        the UART library (defined in uart.c).
+        Include the file in the project when this library is needed.
+        Use #include "uart.h" in the source files where the functions are needed.
  */
 /* ************************************************************************** */
 
 #ifndef _UART_H    /* Guard against multiple inclusion */
 #define _UART_H
 
-#define	cchRxMax	0xFF//64	// maximum number of characters a command
-						// can contain including the CRLF ("\r\n")
-void UART_Init();
-void UART_InitRXInt();
-void UART_ConfigurePins();
-void UART_ConfigureUart();
+#define	cchRxMax	0xFF	// maximum number of characters a CR+LF terminated string
+void UART_InitPoll(unsigned int baud);
+void UART_Init(unsigned int baud);
 void UART_CloseUART();
 
 
 void UART_PutString(char szData[]);
-unsigned char UART_GetChar();
+unsigned char UART_GetCharPoll();
 unsigned char UART_AvaliableRx();
 unsigned char UART_GetString( char* pchBuff, int cchBuff );
 unsigned char UART_GetStringPoll(unsigned char *pText);
-unsigned char UART_GetString1( char* pchBuff, int cchBuff );
+
+// private functions
+void UART_ConfigurePins();
+void UART_ConfigureUart(unsigned int baud);
+void UART_ConfigureUartRXInt(unsigned int baud);
+
+
 //#ifdef __cplusplus
 //extern "C" {
 //#endif

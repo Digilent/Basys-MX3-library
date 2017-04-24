@@ -2,27 +2,42 @@
 /** Descriptive File Name
 
   @Company
-    Company Name
+    Digilent
 
   @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
+    acl.h
 
   @Description
-    Describe the purpose of this file.
+        This file groups the declarations of the functions that implement
+        the ACL library (defined in acl.c).
+        Include the file in the project when this library is needed.
+        Use #include "acl.h" in the source files where the functions are needed.
  */
 /* ************************************************************************** */
 
 #ifndef _ACL_H    /* Guard against multiple inclusion */
 #define _ACL_H
 
-void ACL_Init();
-void ACL_ConfigurePins();
-void ACL_ConfigureI2C();
 
-unsigned char ACL_I2C_Init(unsigned long clockFreq);
+
+#define ACL_I2C_ADDR        0x1D
+#define ACL_OUT_X_MSB       0x01 
+#define ACL_CTRL_REG1       0x2A
+#define ACL_DEVICE_ID       0x0D 
+#define ACL_XYZDATACFG      0x0E 
+
+// function prototypes
+void ACL_Init();
+void ACL_ReadRawValues(unsigned char *rgRawVals);
+void ACL_ReadGValues(float *rgGVals);
+unsigned char ACL_SetRange(unsigned char bRange);
+float ACL_ConvertRawToValueG(unsigned char *rgRawVals);
+unsigned char ACL_SetRegister(unsigned char bAddress, unsigned char bValue);
+unsigned char ACL_GetRegister(unsigned char bAddress);
+
+//private functions:
+void ACL_ConfigurePins();
+void ACL_I2C_Init(unsigned int clockFreq);
 unsigned char ACL_I2C_Write(unsigned char slaveAddress,
                         unsigned char* dataBuffer,
                         unsigned char bytesNumber,
@@ -30,19 +45,9 @@ unsigned char ACL_I2C_Write(unsigned char slaveAddress,
 unsigned char ACL_I2C_Read(unsigned char slaveAddress,
                     unsigned char* dataBuffer,
                     unsigned char bytesNumber);
-unsigned char ACL_SetRegister(unsigned char bAddress, unsigned char bValue);
-unsigned char ACL_SetRange(unsigned char bRange);
-void ACL_ReadRawValues(unsigned char *rgRawVals);
-unsigned char ACL_GetRegister(unsigned char bAddress);
-float ACL_ConvertRawToValueG(unsigned char *rgRawVals);
-void ACL_ReadGValues(float *rgGVals);
 
-#define ACL_I2C_ADDR    0x1D
 
-#define ACL_OUT_X_MSB       0x01 
-#define ACL_CTRL_REG1       0x2A
-#define ACL_DEVICE_ID       0x0D 
-#define ACL_XYZDATACFG      0x0E 
+
 //#ifdef __cplusplus
 //extern "C" {
 //#endif

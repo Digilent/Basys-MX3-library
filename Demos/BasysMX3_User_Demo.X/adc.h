@@ -2,27 +2,24 @@
 /** Descriptive File Name
 
   @Company
-    Company Name
+    Digilent
 
   @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
+    adc.h
 
   @Description
-    Describe the purpose of this file.
+        This file groups the declarations of the functions that implement
+        the ADC module (defined in adc.c). This module is used by AIC and MIC libraries.
+        Include the file in the project when the AIC and MIC libraries are needed.
  */
 /* ************************************************************************** */
 
 #ifndef _ADC_H    /* Guard against multiple inclusion */
 #define _ADC_H
 
+
 void ADC_Init();
-void ADC_ConfigurePins();
-void ADC_ConfigureAnalogInput(unsigned char channelNumber);
-unsigned int POT_Val();
-int ADC_analogRead(char analogPIN);
+unsigned int ADC_AnalogRead(unsigned char analogPIN);
 //#ifdef __cplusplus
 //extern "C" {
 //#endif

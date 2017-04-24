@@ -2,17 +2,21 @@
 /** Descriptive File Name
 
   @Company
-    Company Name
+    Digilent
 
   @File Name
-    filename.c
+    btn.c
 
-  @Summary
-    Brief description of the file.
 
   @Description
-    Describe the purpose of this file.
- */
+        This file groups the functions that implement the BTN library.
+        The functions implement basic digital input functionality needed for the onboard buttons.
+        Include the file in the project, together with config.h, when this library is needed.
+ 
+  @Author
+    Cristian Fatu 
+    cristian.fatu@digilent.ro
+*/
 /* ************************************************************************** */
 
 /* ************************************************************************** */
@@ -25,127 +29,42 @@
 #include "btn.h"
 
 
-#include "led.h"
-
 /* ************************************************************************** */
-unsigned char (*pcallbackFuncBtn)();
-//void __ISR(_CHANGE_NOTICE_VECTOR, ipl2) CN_Int_ISR(void)
 
-// -----------------------------------------------------------------------------
-//  ISR handlers
-// -----------------------------------------------------------------------------
-
-/*
- * Although I couldn't get the ISR called, the status bits are set, so this works:
-        if(CNSTATBbits.CNSTATB8 == 1)
-        {
-            LED_SetValue(3, 1);
-        }
-        if(CNSTATAbits.CNSTATA15 == 1)
-        {
-            LED_SetValue(4, 1);
-        }
- */
-// Implement interrupt handlers
-
-void __ISR(_CHANGE_NOTICE_VECTOR, ipl5SOFT) CN_Int_ISR(void)
-{
-   unsigned int thisb = PORTB; // Read PORTB to clear mismatch condition
-    //LATASET = 1;                     // toggle RA1
-   LED_SetValue(0, 1);
-    
-//    LATGINV = (1<<6);   //debug - toggle RG6 (JA4)
-   
-    
-//    IFS1CLR = 0x0001; // Be sure to clear the CN interrupt status
-                    // flag before exiting the service routine.
-   IFS1bits.CNBIF = 0;                  // clear interrupt flag for PORTB Input Change Interrupt
-}
-
-void BTN_SetCallbackFunction(unsigned char (*pfIntHandler)())
-{
-    pcallbackFuncBtn = pfIntHandler;
-}
-
-
- void BTN_InitChangeNotification()
-{
-    unsigned char bDummmy;
-    ANSELB = 0 ;	//set all pins that share analog and make them digital
-    PORTB = 0;    
-    PORTA = 0;    
-    //INTDisableInterrupts();             // INT step 2: disable interrupts at CPU    
-    CNENBbits.CNIEB0 = 1; // RB0 (BTNU) produce change notification
-    CNENBbits.CNIEB1 = 1; // RB1 (BTNL) produce change notification
-    CNENBbits.CNIEB8 = 1; // RB8 (BTNR) produce change notification
-
-    CNPDBbits.CNPDB0 = 1;     //change notice pull=up
-    CNPDBbits.CNPDB1 = 1;     //change notice pull=up
-    CNPDBbits.CNPDB8 = 1;     //change notice pull=up
-
-
-    CNCONBbits.ON = 1; // ON
-
-   bDummmy = PORTB; // Read port(s) to clear mismatch on change notice pins
-    
-    
-    
-    IEC1bits.CNBIE = 0;   //disable interrupts IEC0<14> = PORTB change p87
-    IEC1bits.CNAIE = 0;   //disable interrupts IEC0<14> = PORTB change p87
-    IFS1bits.CNBIF = 0;                  // clear interrupt flag for PORTB Input Change Interrupt
-    IFS1bits.CNAIF = 0;                  // clear interrupt flag for PORTB Input Change Interrupt
-
-    IEC1bits.CNBIE = 1; // Enable CN on port B interrupts 
-
-     INTEnableSystemMultiVectoredInt(); // avoid single vectror mode
-
- }
-/*
-void BTN_InitChangeNotification()
-{
-// Setup the change notice options
-    ANSELB = 0 ;
-    PORTB = 0;
-  CNCONCbits.ON = 1;        //CN is enabled
-//  CNCONCbits.SIDL = 0;    //CPU Idle does not affect CN operation
-  CNENBbits.CNIEB1 = 1;    //Enable RB1 change notice
-  CNENBbits.CNIEB8 = 1;    //Enable RB8 change notice
-  CNENBbits.CNIEB0 = 1;    //Enable RB0 change notice
- 
-  // Read port C to clear mismatch condition
-  unsigned char tmp = PORTB;
-
-    INTEnableSystemMultiVectoredInt();
-    
-        IEC1bits.CNBIE = 0;
-  // Clear CN interrupt flag, set CN interrupt priority, enable CN interrupt
-  IFS1bits.CNBIF = 0;           // clear status register for port B
-//  IPC8CLR = _IPC8_CNIP_MASK;                //clear priority
-//  IPC8SET = (2 << _IPC8_CNIP_POSITION);    //set priority (2)
-  IEC1bits.CNBIE = 1; // enable CN interrupts on port C
- 
-  // Pulldown enable
-//  CNPDBbits.CNPDB1 = 0;
-  CNPDBbits.CNPDB8 = 0;
-//  CNPDBbits.CNPDB0 = 0;
-  
-  
-//  CNPUBbits.CNPUB4 = 0;
-//  CNPUBbits.CNPUB5 = 0;
-//  CNPUBbits.CNPUB6 = 0;
-//  CNPUBbits.CNPUB7 = 0;  
- 
-  // Enable interrupts
-
-}
+/* ------------------------------------------------------------ */
+/***	BTN_Init
+**
+**	Parameters:
+**		
+**
+**	Return Value:
+**		
+**
+**	Description:
+**		This function initializes the hardware involved in the BTN module. 
+**      The pins corresponding to buttons are initialized as digital inputs.
+**          
 */
 void BTN_Init()
 {
     BTN_ConfigurePins();
-    // not finalized
-//    BTN_InitChangeNotification();
 }
 
+/* ------------------------------------------------------------ */
+/***	BTN_ConfigurePins
+**
+**	Parameters:
+**		
+**
+**	Return Value:
+**		
+**
+**	Description:
+**		This function configures the IO pins used in the BTN module as digital input pins. 
+**      The function uses pin related definitions from config.h file.
+**      This is a low-level function called by BTN_Init(), so user should avoid calling it directly.        
+**          
+*/
 void BTN_ConfigurePins()
 {
     // Configure BTNs as digital inputs.
@@ -161,10 +80,33 @@ void BTN_ConfigurePins()
     ansel_BTN_BTNR = 0;
 }
 
-
+/* ------------------------------------------------------------ */
+/***	BTN_GetValue
+**
+**	Parameters:
+**		unsigned char btn   - the identification of button whose value will be read.  
+**                              The value can be the number or the letter associated to a button:
+**                                  0, 'U', 'u': BTNU
+**                                  1, 'L', 'l': BTNL
+**                                  2, 'C', 'c': BTNC
+**                                  3, 'R', 'r': BTNR
+**                                  4, 'D', 'd': BTND
+**
+**	Return Value:
+**		unsigned char   - the value corresponding to the specified button:
+**                                  0 when corresponding button is not pressed
+**                                  1 when corresponding button is pressed
+**                      - 0xFF if btn is not between 0 and 4, or one of 'U', 'u', 'L', 'l', 'C', 'c', 'R', 'r', 'D', 'd' 
+**
+**	Description:
+**		This function gets the value of the BTN specified by btn parameter.
+**      If the value provided for btn is not between 0 and 4, 
+**      or one of 'U', 'u', 'L', 'l', 'C', 'c', 'R', 'r', 'D', 'd', then the function returns 0xFF.
+**          
+*/
 unsigned char BTN_GetValue(unsigned char btn)
 {
-    unsigned bResult = 0;
+    unsigned bResult = 0xFF;
     
     switch (btn)
     {
@@ -198,6 +140,34 @@ unsigned char BTN_GetValue(unsigned char btn)
     return bResult;
 }
 
+/* ------------------------------------------------------------ */
+/***	BTN_GetGroupValue
+**
+**	Parameters:
+**
+**	Return Value:
+**		unsigned char   - the 8 bit value 0 0 0 B4 B3 B2 B1 B0 where bit Bi corresponds to a button:
+**                              B0 has the value 0 when BTNU is not pressed
+**                              B0 has the value 1 when BTNU is pressed
+**                              B1 has the value 0 when BTNL is not pressed
+**                              B1 has the value 1 when BTNL is pressed
+**                              B2 has the value 0 when BTNC is not pressed
+**                              B2 has the value 1 when BTNC is pressed
+**                              B3 has the value 0 when BTNR is not pressed
+**                              B3 has the value 1 when BTNR is pressed
+**                              B4 has the value 0 when BTND is not pressed
+**                              B4 has the value 1 when BTND is pressed
+**		
+**
+**	Description:
+**		This function gets the value of the all 5 buttons as a single value represented on 8 bits.  
+**      The 5 LSB bits from returned value byte correspond to a button: 
+**      bit 0 corresponds to BTNU,
+**      bit 1 corresponds to BTNL, 
+**      bit 2 corresponds to BTNC, 
+**      bit 3 corresponds to BTNR, 
+**      bit 4 corresponds to BTND (see return value description).          
+*/
 unsigned char BTN_GetGroupValue()
 {
     unsigned char bResult = 0;

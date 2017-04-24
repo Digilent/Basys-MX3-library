@@ -8,6 +8,7 @@
 #include "btn.h"
 #include <xc.h>  
 #include <sys/attribs.h>
+#include <string.h>
 
 #define LEDS_THRESHOLD 100
 #define RGBLED_THRESHOLD 500
@@ -83,7 +84,7 @@ extern volatile unsigned char ACL_POT_EN;
 **              - implement SSD activity according to the time flow
 **          
 */
-void __ISR(_TIMER_4_VECTOR, ipl2) Timer4SR(void) 
+void __ISR(_TIMER_4_VECTOR, ipl2auto) Timer4SR(void) 
 {
     static unsigned char idxLedVal = 0, idxRGBLedVal = 0, idxSSDVal = 0, btnVal=0;
 
@@ -170,19 +171,18 @@ void Timer4Setup()
     static int fTimerInitialised = 0;
     if(!fTimerInitialised)
     {
-        INTDisableInterrupts();             // INT step 2: disable interrupts at CPU
-                                          // INT step 3: setup peripheral
+        
+                                          //  setup peripheral
         PR4 = 10000;                        //             set period register, generates one interrupt every 1 ms
         TMR4 = 0;                           //             initialize count to 0
         T4CONbits.TCKPS = 3;                //            1:256 prescale value
         T4CONbits.TGATE = 0;                //             not gated input (the default)
         T4CONbits.TCS = 0;                  //             PCBLK input (the default)
         T4CONbits.ON = 1;                   //             turn on Timer1
-        IPC4bits.T4IP = 2;                  // INT step 4: priority
+        IPC4bits.T4IP = 2;                  //             priority
         IPC4bits.T4IS = 0;                  //             subpriority
-        IFS0bits.T4IF = 0;                  // INT step 5: clear interrupt flag
-        IEC0bits.T4IE = 1;                  // INT step 6: enable interrupt
-        INTEnableSystemMultiVectoredInt();  // INT step 7: enable interrupts at CPU
+        IFS0bits.T4IF = 0;                  //             clear interrupt flag
+        IEC0bits.T4IE = 1;                  //             enable interrupt
         fTimerInitialised = 1;
     }
 }

@@ -45,7 +45,10 @@
 
 #define LINES 6
 #define LENGTH 16
-const char LCD_Strings[LINES][LENGTH]={ "Welcome! To get ","started go to:  ",
+
+unsigned int POT_Val();
+
+char LCD_Strings[LINES][LENGTH]={ "Welcome! To get ","started go to:  ",
                                         "digilentinc.com ","/basysmx3       ",
                                         "Press BTNC to   ","toggle display. "};
 int LCD_Line=0;
@@ -118,4 +121,10 @@ int main(int argc, char** argv)
             }
     }
     return (1);
+}
+
+
+unsigned int POT_Val()
+{
+    return ADC_AnalogRead(2);    // Read the ADC Value
 }
