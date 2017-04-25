@@ -431,19 +431,19 @@ void LCD_CursorShift(unsigned char fRight)
 **	Description:
 **		Displays the specified string at the specified position on the specified line. 
 **		It sets the corresponding write position and then writes data bytes when the device is ready.
-**      Strings longer than 40 characters are trimmed. 
+**      Strings longer than 32 characters are trimmed. 
 **      It is possible that not all the characters will be visualized, as the display only visualizes 16 characters for one line.
 **      
 **          
 */
 void LCD_WriteStringAtPos(char *szLn, unsigned char idxLine, unsigned char idxPos)
 {
-	// crop string to 0x27 chars
+	// crop string to 0x1F chars
 	int len = strlen(szLn);
-	if(len > 0x27)
+	if(len > 0x1F)
 	{
-        szLn[0x27] = 0; // trim the string so it contains 40 characters 
-		len = 0x27;
+        szLn[0x1F] = 0; // trim the string so it contains 32 characters 
+		len = 0x1F;
 	}
 
 	// Set write position
