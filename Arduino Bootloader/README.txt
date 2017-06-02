@@ -1,0 +1,2 @@
+This bootloader can be used to program the Basys MX3 in the Arduino environment. Upload this file to your Basys MX3 (via the DEBUG port) using MPLAB IPE or IDE.
+Follow the guide at https://reference.digilentinc.com/reference/software/digilent-core/start to install the Digilent core from Arduino to get started!
