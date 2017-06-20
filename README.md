@@ -41,7 +41,7 @@ Demos that use each of the libraries are found in the Demos folder. They are pro
 
 ## Known Issues
 
-* With some versions of Microchip XC32 compiler (1.41, for example) there are some errors related to INTDisableInterrupts and INTEnableSystemMultiVectoredInt. We recommend XC32 version 1.31. 
+
 
 
 

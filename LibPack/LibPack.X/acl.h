@@ -34,15 +34,15 @@ unsigned char ACL_SetRange(unsigned char bRange);
 float ACL_ConvertRawToValueG(unsigned char *rgRawVals);
 unsigned char ACL_SetRegister(unsigned char bAddress, unsigned char bValue);
 unsigned char ACL_GetRegister(unsigned char bAddress);
-
+ 
 //private functions:
 void ACL_ConfigurePins();
-void ACL_I2C_Init(unsigned int clockFreq);
-unsigned char ACL_I2C_Write(unsigned char slaveAddress,
+void I2C_Init(unsigned int clockFreq);
+unsigned char I2C_Write(unsigned char slaveAddress,
                         unsigned char* dataBuffer,
                         unsigned char bytesNumber,
                         unsigned char stopBit);
-unsigned char ACL_I2C_Read(unsigned char slaveAddress,
+unsigned char I2C_Read(unsigned char slaveAddress,
                     unsigned char* dataBuffer,
                     unsigned char bytesNumber);
 

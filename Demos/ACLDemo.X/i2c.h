@@ -2,27 +2,34 @@
 /** Descriptive File Name
 
   @Company
-    Company Name
+    Digilent
 
   @File Name
-    filename.h
-
-  @Summary
-    Brief description of the file.
+    acl.h
 
   @Description
-    Describe the purpose of this file.
+        This file groups the declarations of the functions that implement
+        the I2C library (defined in acl.c).
+        Include the file in the project when this library is needed.
+        Use #include "i2c.h" in the source files where the functions are needed.
  */
 /* ************************************************************************** */
 
-#ifndef _SPIJA_H    /* Guard against multiple inclusion */
-#define _SPIJA_H
+#ifndef _I2C_H    /* Guard against multiple inclusion */
+#define _I2C_H
 
-void SPIJA_Init();
-void SPIJA_ConfigurePins();
-void SPIJA_ConfigureSPI();
-unsigned char SPIJA_TransferByte(unsigned char bVal);
-void SPIFLASH_TransferBytes(int nBytes, unsigned char *pbRdData, unsigned char *pbWrData);
+
+void I2C_Init(unsigned int clockFreq);
+unsigned char I2C_Write(unsigned char slaveAddress,
+                        unsigned char* dataBuffer,
+                        unsigned char bytesNumber,
+                        unsigned char stopBit);
+unsigned char I2C_Read(unsigned char slaveAddress,
+                    unsigned char* dataBuffer,
+                    unsigned char bytesNumber);
+
+void I2C_Close();
+
 //#ifdef __cplusplus
 //extern "C" {
 //#endif
@@ -41,7 +48,7 @@ void SPIFLASH_TransferBytes(int nBytes, unsigned char *pbRdData, unsigned char *
 //#ifdef __cplusplus
 //}
 //#endif
-#endif /* _SPIJA_H */
+#endif /* _I2C_H */
 
 /* *****************************************************************************
  End of File
