@@ -17,10 +17,13 @@
 
   @Author
     Cristian Fatu 
-    cristian.fatu@digilent.ro
+    cristian.fatu@digilent.ro 
  */
 /* ************************************************************************** */
-
+/* Version control
+ * 04/13/2017 Initial Version
+ * 07/10/2017 Bugfix: Rename global variables so that UARTJB library can be properly used together with UART library
+*/
 /* ************************************************************************** */
 /* ************************************************************************** */
 /* Section: Included Files                                                    */
@@ -30,9 +33,9 @@
 #include "config.h"
 #include "uartjb.h"
 
-volatile unsigned char fRxDone;
-volatile unsigned char ichRx;
-char rgchRx[cchRxMax];
+volatile unsigned char fRxDoneJB;
+volatile unsigned char ichRxJB;
+char rgchRxJB[cchRxMax];
 /* ************************************************************************** */
 
 /* ------------------------------------------------------------ */
@@ -41,9 +44,9 @@ char rgchRx[cchRxMax];
 **	Description:
 **		This is the interrupt handler for UART1 RX. It is used to receive strings using interrupt method. 
 **      The interrupt recognizes a string having up to cchRxMax - 2 characters, followed by a CRLF.
-**      When available received bytes are found they are placed in a global string rgchRx.
+**      When available received bytes are found they are placed in a global string rgchRxJB.
 **      When a carriage return and a line feed ("\r\n", CRLF) sequence is recognized, the interrupt handler 
-**      flags the success using the fRxDone global variable and then ignores the received bytes.
+**      flags the success using the fRxDoneJB global variable and then ignores the received bytes.
 **          
 */
 void __ISR(_UART_1_VECTOR, IPL7SRS) Uart1Handler (void)
@@ -55,28 +58,28 @@ void __ISR(_UART_1_VECTOR, IPL7SRS) Uart1Handler (void)
 	{
 		bVal = (unsigned char)U1RXREG;
 		
-		if(!fRxDone)
+		if(!fRxDoneJB)
 	    {
 	        // Do we have space to store another character?
-	        if (cchRxMax > ichRx)
+	        if (cchRxMax > ichRxJB)
 	        {
 	            // Yes.
-                rgchRx[ichRx] = bVal;
+                rgchRxJB[ichRxJB] = bVal;
 	            // Is this the last character of the command?
-	            if(('\n' == rgchRx[ichRx] ) && ('\r' == rgchRx[ichRx-1]))
+	            if(('\n' == rgchRxJB[ichRxJB] ) && ('\r' == rgchRxJB[ichRxJB-1]))
 	            {
 	                // Yes.
-	                fRxDone = 1;
+	                fRxDoneJB = 1;
 	            }   
 	
-	            ichRx++;
+	            ichRxJB++;
 	        }   
 	        else
 	        {
 	            // No we don't have space to store anymore characters.
 	            // Mark the command as complete.
 	
-	            fRxDone = 1;
+	            fRxDoneJB = 1;
 	        }   
     	}  
 	}  
@@ -381,33 +384,33 @@ unsigned char UARTJB_GetString( char* pchBuff, int cchBuff )
 	unsigned char ich;
 	
 	// Have we finished receiving a CR+LF terminated string via UART1?
-	if(!fRxDone)
+	if(!fRxDoneJB)
 	{
 		return 0;
 	}
 	// Was a 0 character CR+LF terminated string received?
-	if(2 == ichRx )
+	if(2 == ichRxJB )
 	{
 		// A zero character length CR+LF terminated string was received.
 		macro_disable_interrupts;
-		fRxDone = 0;
-		ichRx = 0;
+		fRxDoneJB = 0;
+		ichRxJB = 0;
 		macro_enable_interrupts();
 		
 		return -3;
 	}
 	
     // copy the received chars to the destination location.
-	for(ich = 0; ich < ichRx - 2; ich++)
+	for(ich = 0; ich < ichRxJB - 2; ich++)
 	{
-		*pchBuff = rgchRx[ich]; 
+		*pchBuff = rgchRxJB[ich]; 
 		pchBuff++;
 	}
 	*pchBuff = '\0';
 	
 	macro_disable_interrupts;
-	fRxDone = 0;
-	ichRx = 0;
+	fRxDoneJB = 0;
+	ichRxJB = 0;
 	macro_enable_interrupts();
 	
 	return ich;
