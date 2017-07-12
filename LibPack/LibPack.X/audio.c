@@ -317,6 +317,7 @@ void AUDIO_Close()
 {
         T3CONbits.ON = 0;       // turn off Timer3
         OC1CONbits.ON = 0;      // Turn off OC1
+        bAudioMode = -1;        // reset bAudioMode parameter
         
 }
 
