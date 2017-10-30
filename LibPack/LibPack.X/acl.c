@@ -184,17 +184,24 @@ unsigned char ACL_GetDeviceID()
 unsigned char ACL_SetRange(unsigned char bRange)
 {
     unsigned char bResult, bVal;
-    bRange &= 3;    // only 2 least significant bits from bRange are used
-
     
+    //Set accelerometer to standby mode
+    ACL_SetRegister(ACL_CTRL_REG1, (ACL_GetRegister(ACL_CTRL_REG1) & 0xFE));
+    
+    //Change accelerometer Dynamic Range
     bVal = ACL_GetRegister(ACL_XYZDATACFG); // get old value of the register
-    bVal &= 0xFC;   // mask out the 2 LSBs
-    bVal |= bRange; // set the 2 LSBs according to the range value
+    bVal &= 0xFC; // mask out the 2 LSBs
+    bVal |= bRange;  // set the 2 LSBs according to the range value
     bResult = ACL_SetRegister(ACL_XYZDATACFG, bVal);
-
+    
     // set fGRangeLSB according to the selected range
+    bRange &= 3;
     unsigned char bValRange = 1<<(bRange + 2);
     fGRangeLSB = ((float)bValRange)/(1<<12);     // the range is divided to the resolution corresponding to number of bits (12)
+    
+    //Set accelerometer back to active mode
+    ACL_SetRegister(ACL_CTRL_REG1, (ACL_GetRegister(ACL_CTRL_REG1) | 0x01));
+    
     return bResult;
 }
 
