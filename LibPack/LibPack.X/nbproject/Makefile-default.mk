@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=IrDA.c acl.c adc.c audio.c btn.c lcd.c led.c main.c mic.c mot.c pmods.c rgbled.c spiflash.c spija.c srv.c ssd.c swt.c uart.c uartjb.c utils.c aic.c ../../../../../MPLABXProjects/ultrasonic_bot.X/ultr.c
+SOURCEFILES_QUOTED_IF_SPACED=IrDA.c acl.c adc.c audio.c btn.c lcd.c led.c main.c mic.c mot.c pmods.c rgbled.c spiflash.c spija.c srv.c ssd.c swt.c uart.c uartjb.c utils.c aic.c ultr.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/IrDA.o ${OBJECTDIR}/acl.o ${OBJECTDIR}/adc.o ${OBJECTDIR}/audio.o ${OBJECTDIR}/btn.o ${OBJECTDIR}/lcd.o ${OBJECTDIR}/led.o ${OBJECTDIR}/main.o ${OBJECTDIR}/mic.o ${OBJECTDIR}/mot.o ${OBJECTDIR}/pmods.o ${OBJECTDIR}/rgbled.o ${OBJECTDIR}/spiflash.o ${OBJECTDIR}/spija.o ${OBJECTDIR}/srv.o ${OBJECTDIR}/ssd.o ${OBJECTDIR}/swt.o ${OBJECTDIR}/uart.o ${OBJECTDIR}/uartjb.o ${OBJECTDIR}/utils.o ${OBJECTDIR}/aic.o ${OBJECTDIR}/_ext/265943498/ultr.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/IrDA.o.d ${OBJECTDIR}/acl.o.d ${OBJECTDIR}/adc.o.d ${OBJECTDIR}/audio.o.d ${OBJECTDIR}/btn.o.d ${OBJECTDIR}/lcd.o.d ${OBJECTDIR}/led.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/mic.o.d ${OBJECTDIR}/mot.o.d ${OBJECTDIR}/pmods.o.d ${OBJECTDIR}/rgbled.o.d ${OBJECTDIR}/spiflash.o.d ${OBJECTDIR}/spija.o.d ${OBJECTDIR}/srv.o.d ${OBJECTDIR}/ssd.o.d ${OBJECTDIR}/swt.o.d ${OBJECTDIR}/uart.o.d ${OBJECTDIR}/uartjb.o.d ${OBJECTDIR}/utils.o.d ${OBJECTDIR}/aic.o.d ${OBJECTDIR}/_ext/265943498/ultr.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/IrDA.o ${OBJECTDIR}/acl.o ${OBJECTDIR}/adc.o ${OBJECTDIR}/audio.o ${OBJECTDIR}/btn.o ${OBJECTDIR}/lcd.o ${OBJECTDIR}/led.o ${OBJECTDIR}/main.o ${OBJECTDIR}/mic.o ${OBJECTDIR}/mot.o ${OBJECTDIR}/pmods.o ${OBJECTDIR}/rgbled.o ${OBJECTDIR}/spiflash.o ${OBJECTDIR}/spija.o ${OBJECTDIR}/srv.o ${OBJECTDIR}/ssd.o ${OBJECTDIR}/swt.o ${OBJECTDIR}/uart.o ${OBJECTDIR}/uartjb.o ${OBJECTDIR}/utils.o ${OBJECTDIR}/aic.o ${OBJECTDIR}/ultr.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/IrDA.o.d ${OBJECTDIR}/acl.o.d ${OBJECTDIR}/adc.o.d ${OBJECTDIR}/audio.o.d ${OBJECTDIR}/btn.o.d ${OBJECTDIR}/lcd.o.d ${OBJECTDIR}/led.o.d ${OBJECTDIR}/main.o.d ${OBJECTDIR}/mic.o.d ${OBJECTDIR}/mot.o.d ${OBJECTDIR}/pmods.o.d ${OBJECTDIR}/rgbled.o.d ${OBJECTDIR}/spiflash.o.d ${OBJECTDIR}/spija.o.d ${OBJECTDIR}/srv.o.d ${OBJECTDIR}/ssd.o.d ${OBJECTDIR}/swt.o.d ${OBJECTDIR}/uart.o.d ${OBJECTDIR}/uartjb.o.d ${OBJECTDIR}/utils.o.d ${OBJECTDIR}/aic.o.d ${OBJECTDIR}/ultr.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/IrDA.o ${OBJECTDIR}/acl.o ${OBJECTDIR}/adc.o ${OBJECTDIR}/audio.o ${OBJECTDIR}/btn.o ${OBJECTDIR}/lcd.o ${OBJECTDIR}/led.o ${OBJECTDIR}/main.o ${OBJECTDIR}/mic.o ${OBJECTDIR}/mot.o ${OBJECTDIR}/pmods.o ${OBJECTDIR}/rgbled.o ${OBJECTDIR}/spiflash.o ${OBJECTDIR}/spija.o ${OBJECTDIR}/srv.o ${OBJECTDIR}/ssd.o ${OBJECTDIR}/swt.o ${OBJECTDIR}/uart.o ${OBJECTDIR}/uartjb.o ${OBJECTDIR}/utils.o ${OBJECTDIR}/aic.o ${OBJECTDIR}/_ext/265943498/ultr.o
+OBJECTFILES=${OBJECTDIR}/IrDA.o ${OBJECTDIR}/acl.o ${OBJECTDIR}/adc.o ${OBJECTDIR}/audio.o ${OBJECTDIR}/btn.o ${OBJECTDIR}/lcd.o ${OBJECTDIR}/led.o ${OBJECTDIR}/main.o ${OBJECTDIR}/mic.o ${OBJECTDIR}/mot.o ${OBJECTDIR}/pmods.o ${OBJECTDIR}/rgbled.o ${OBJECTDIR}/spiflash.o ${OBJECTDIR}/spija.o ${OBJECTDIR}/srv.o ${OBJECTDIR}/ssd.o ${OBJECTDIR}/swt.o ${OBJECTDIR}/uart.o ${OBJECTDIR}/uartjb.o ${OBJECTDIR}/utils.o ${OBJECTDIR}/aic.o ${OBJECTDIR}/ultr.o
 
 # Source Files
-SOURCEFILES=IrDA.c acl.c adc.c audio.c btn.c lcd.c led.c main.c mic.c mot.c pmods.c rgbled.c spiflash.c spija.c srv.c ssd.c swt.c uart.c uartjb.c utils.c aic.c ../../../../../MPLABXProjects/ultrasonic_bot.X/ultr.c
+SOURCEFILES=IrDA.c acl.c adc.c audio.c btn.c lcd.c led.c main.c mic.c mot.c pmods.c rgbled.c spiflash.c spija.c srv.c ssd.c swt.c uart.c uartjb.c utils.c aic.c ultr.c
 
 
 CFLAGS=
@@ -232,11 +232,11 @@ ${OBJECTDIR}/aic.o: aic.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/aic.o 
 	@${FIXDEPS} "${OBJECTDIR}/aic.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -DPK3OBPlatformTool=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/aic.o.d" -o ${OBJECTDIR}/aic.o aic.c    -DXPRJ_default=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD) 
 	
-${OBJECTDIR}/_ext/265943498/ultr.o: ../../../../../MPLABXProjects/ultrasonic_bot.X/ultr.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/_ext/265943498" 
-	@${RM} ${OBJECTDIR}/_ext/265943498/ultr.o.d 
-	@${RM} ${OBJECTDIR}/_ext/265943498/ultr.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/265943498/ultr.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -DPK3OBPlatformTool=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/265943498/ultr.o.d" -o ${OBJECTDIR}/_ext/265943498/ultr.o ../../../../../MPLABXProjects/ultrasonic_bot.X/ultr.c    -DXPRJ_default=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD) 
+${OBJECTDIR}/ultr.o: ultr.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/ultr.o.d 
+	@${RM} ${OBJECTDIR}/ultr.o 
+	@${FIXDEPS} "${OBJECTDIR}/ultr.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -DPK3OBPlatformTool=1  -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/ultr.o.d" -o ${OBJECTDIR}/ultr.o ultr.c    -DXPRJ_default=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD) 
 	
 else
 ${OBJECTDIR}/IrDA.o: IrDA.c  nbproject/Makefile-${CND_CONF}.mk
@@ -365,11 +365,11 @@ ${OBJECTDIR}/aic.o: aic.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/aic.o 
 	@${FIXDEPS} "${OBJECTDIR}/aic.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/aic.o.d" -o ${OBJECTDIR}/aic.o aic.c    -DXPRJ_default=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD) 
 	
-${OBJECTDIR}/_ext/265943498/ultr.o: ../../../../../MPLABXProjects/ultrasonic_bot.X/ultr.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/_ext/265943498" 
-	@${RM} ${OBJECTDIR}/_ext/265943498/ultr.o.d 
-	@${RM} ${OBJECTDIR}/_ext/265943498/ultr.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/265943498/ultr.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/265943498/ultr.o.d" -o ${OBJECTDIR}/_ext/265943498/ultr.o ../../../../../MPLABXProjects/ultrasonic_bot.X/ultr.c    -DXPRJ_default=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD) 
+${OBJECTDIR}/ultr.o: ultr.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}" 
+	@${RM} ${OBJECTDIR}/ultr.o.d 
+	@${RM} ${OBJECTDIR}/ultr.o 
+	@${FIXDEPS} "${OBJECTDIR}/ultr.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/ultr.o.d" -o ${OBJECTDIR}/ultr.o ultr.c    -DXPRJ_default=$(CND_CONF)  -no-legacy-libc  $(COMPARISON_BUILD) 
 	
 endif
 
