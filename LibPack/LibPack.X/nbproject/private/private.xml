@@ -3,7 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/Z:/Products/Digilent/BasysMX3/Software/LibPack/Release/LibPack/LibPack.X/mot.c</file>
+            <file>file:/C:/Users/email/MPLABXProjects/ultrasonic_bot.X/ub.c</file>
+            <file>file:/C:/Users/email/MPLABXProjects/ultrasonic_bot.X/ultr.c</file>
+            <file>file:/C:/Users/email/MPLABXProjects/ultrasonic_bot.X/ultr.h</file>
+            <file>file:/C:/Users/email/MPLABXProjects/ultrasonic_bot.X/srv.c</file>
+            <file>file:/C:/Users/email/MPLABXProjects/ultrasonic_bot.X/audio.c</file>
+            <file>file:/C:/Users/email/MPLABXProjects/ultrasonic_bot.X/pmods.c</file>
+            <file>file:/C:/Users/email/MPLABXProjects/ultrasonic_bot.X/srv.h</file>
+            <file>file:/C:/Users/email/MPLABXProjects/ultrasonic_bot.X/audio.h</file>
         </group>
     </open-files>
 </project-private>
