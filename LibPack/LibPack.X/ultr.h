@@ -21,8 +21,7 @@
 
 void ULTR_Init(int ePinPmod, int ePin, int tPinPmod, int tPin);
 
-float ULTR_MeasureCm();
-float ULTR_MeasureIn();
+int ULTR_MeasureDist();
 
 #endif /* _ULTR_H */
 

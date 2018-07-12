@@ -29,6 +29,7 @@
 #include <sys/attribs.h>
 #include "config.h"
 #include "srv.h"
+#include "pmods.h"
 // FPB = 80000000
 // Timer period 20 ms = 0.02
 // Prescaler 16
@@ -165,6 +166,47 @@ void SRV_SetPulseMicroseconds2(unsigned short usVal)
     float fVal = ((float)(sPR2 + 1) * (float)usVal)/ (TMR_TIME * 1000000);
     OC4RS = (unsigned short)fVal; 
 }
+
+/* ------------------------------------------------------------ */
+/***	SRV_GetPulse
+**
+**	Parameters:
+**		int fPinPmod - the PMOD port the feedback pin is attached to
+ *              0 - PMOD A
+ *              1 - PMOD B
+ *      int fPin - the pin of the PMOD the feedback pin is attached to
+**                              
+**	Return Value:
+**		int  - duty cycle as a percentage scaled up to 1000 to remove decimal
+**      ex. 923 = 92.3%
+**
+**	Description:
+**		This function returns the duty cycle of the PWM signal returned by
+**      Parallax 360 Feedback servo motor
+**          
+*/
+int SRV_GetPulse(int fPinPmod, int fPin){
+    PMODS_InitPin(fPinPmod,fPin,1,0,0);
+    T3CON = 0x8070; //1000000001110000
+    int dutyScale = 1000;                       // Scale duty cycle to 1/1000ths
+    int dc, tHigh, tLow, tCycle;
+    while(1){
+        TMR3 = 0;
+        unsigned int t1 = TMR3;
+        while(PMODS_GetValue(fPinPmod,fPin) == 1);
+        unsigned int t2 = TMR3;
+        while(PMODS_GetValue(fPinPmod,fPin) == 0);
+        unsigned int t3 = TMR3;
+        tHigh = ((t2-t1)/(PB_FRQ/1E6))*256;
+        tLow = ((t3-t2)/(PB_FRQ/1E6))*256;
+        tCycle = (tHigh + tLow);
+        if((tCycle > 1000) && (tCycle < 1200))  // If cycle time valid
+            break;
+    }
+    dc = (dutyScale * tHigh) / tCycle;        // Calculate duty cycle
+    return dc;
+}
+
 
 /* ------------------------------------------------------------ */
 /***	SRV_Close

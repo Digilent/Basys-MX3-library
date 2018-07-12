@@ -21,6 +21,7 @@
 void SRV_Init();
 void SRV_SetPulseMicroseconds1(unsigned short usVal);
 void SRV_SetPulseMicroseconds2(unsigned short usVal);
+int SRV_GetPulse(int fPinPmod, int fPin);
 void SRV_Close();
 
 // private functions
