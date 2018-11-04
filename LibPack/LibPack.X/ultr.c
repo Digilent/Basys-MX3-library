@@ -56,7 +56,7 @@ int triggerPin;
 **		This function initializes the hardware involved in the ULTR module: 
 **      The echo and trigger pin positions are recorded
 **      The echo pin is initialized as an input, and the trigger pin as an output 
-**      Timer 4 is configured with a 1:64 prescale value
+**      Timer 4 is configured with a 1:16 prescale value
 **          
 */
 void ULTR_Init(int ePinPmod, int ePin, int tPinPmod, int tPin)
@@ -67,7 +67,7 @@ void ULTR_Init(int ePinPmod, int ePin, int tPinPmod, int tPin)
     triggerPin = tPin;
     PMODS_InitPin(echoPinPmod,echoPin,1,1,0);
     PMODS_InitPin(triggerPinPmod,triggerPin,0,0,0);
-    T4CON = 0x8060; //1000000001100000    
+    T4CON = 0x8040; //1000000001000000    
 }
 
 /* ------------------------------------------------------------ */
@@ -95,19 +95,20 @@ int ULTR_MeasureDist(){
     for (counter = 0; counter < 15; counter++){}
     PMODS_SetValue(triggerPinPmod,triggerPin,0);
     while(PMODS_GetValue(echoPinPmod,echoPin) == 0){
-        if(TMR4 >= 60000){ // sensor probably unplugged
+        if(TMR4 >= 65500){ // sensor probably unplugged
             return -1;
         }
     }
+    TMR4 = 0;
     unsigned int t1 = TMR4;
     while(PMODS_GetValue(echoPinPmod,echoPin) == 1){
-        if(TMR4 >= 65000){ //timer shouldn't ever rollover
+        if((TMR4-t1) >= 58500){ //Timer has exceeded max range of sensor
             return -1;
         }
     }
     unsigned int t2 = TMR4;
-    int pulse = ((t2-t1)/(PB_FRQ/1E6))*64;
-    if(pulse > 23600){
+    int pulse = ((t2-t1)/(PB_FRQ/1E6))*16;
+    if(pulse > 23400){ //23323.62 us is max range of sensor
         return -1;
     }
     return pulse;
