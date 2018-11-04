@@ -67,7 +67,10 @@ void ULTR_Init(int ePinPmod, int ePin, int tPinPmod, int tPin)
     triggerPin = tPin;
     PMODS_InitPin(echoPinPmod,echoPin,1,1,0);
     PMODS_InitPin(triggerPinPmod,triggerPin,0,0,0);
-    T4CON = 0x8040; //1000000001000000    
+    T4CONbits.TCKPS = 4;     //1:16 pre scale value
+    T4CONbits.TGATE = 0;     //not gated input (the default)
+    T4CONbits.TCS = 0;       //PCBLK input (the default)
+    T4CONbits.ON = 1;        //turn on Timer4
 }
 
 /* ------------------------------------------------------------ */
@@ -112,6 +115,26 @@ int ULTR_MeasureDist(){
         return -1;
     }
     return pulse;
+}
+
+/* ------------------------------------------------------------ */
+/***	ULTR_Close
+**
+**	Parameters:
+** 
+**
+**	Return Value:
+**      
+**
+**	Description:
+**		This functions releases the hardware involved in the ULTR library: 
+**      it turns off the Timer 4 module.
+**      
+**          
+*/
+void SRV_Close()
+{ 
+    T4CONbits.ON = 0;        // turn off Timer2
 }
 /* *****************************************************************************
  End of File

@@ -20,8 +20,8 @@
 #define _ULTR_H
 
 void ULTR_Init(int ePinPmod, int ePin, int tPinPmod, int tPin);
-
 int ULTR_MeasureDist();
+void ULTR_Close();
 
 #endif /* _ULTR_H */
 
