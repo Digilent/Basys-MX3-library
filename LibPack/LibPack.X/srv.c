@@ -128,6 +128,26 @@ void SRV_ConfigurePins()
 }
 
 /* ------------------------------------------------------------ */
+/***	SRV_SetPulseMicroseconds0
+**
+**	Parameters:
+**		unsigned short usVal - the pulse width in microseconds
+**                              
+**	Return Value:
+**		
+**
+**	Description:
+**		This function configures the output compare 5 (corresponding to servo 0) 
+**      according to the specified pulse width.
+**          
+*/
+void SRV_SetPulseMicroseconds0(unsigned short usVal)
+{
+    float fVal = ((float)(sPR2 + 1) * (float)usVal)/ (TMR_TIME * 1000000);
+    OC5RS = (unsigned short)fVal; 
+}
+
+/* ------------------------------------------------------------ */
 /***	SRV_SetPulseMicroseconds1
 **
 **	Parameters:
@@ -137,31 +157,11 @@ void SRV_ConfigurePins()
 **		
 **
 **	Description:
-**		This function configures the output compare 5 (corresponding to servo 1) 
+**		This function configures the output compare 4 (corresponding to servo 1) 
 **      according to the specified pulse width.
 **          
 */
 void SRV_SetPulseMicroseconds1(unsigned short usVal)
-{
-    float fVal = ((float)(sPR2 + 1) * (float)usVal)/ (TMR_TIME * 1000000);
-    OC5RS = (unsigned short)fVal; 
-}
-
-/* ------------------------------------------------------------ */
-/***	SRV_SetPulseMicroseconds2
-**
-**	Parameters:
-**		unsigned short usVal - the pulse width in microseconds
-**                              
-**	Return Value:
-**		
-**
-**	Description:
-**		This function configures the output compare 4 (corresponding to servo 2) 
-**      according to the specified pulse width.
-**          
-*/
-void SRV_SetPulseMicroseconds2(unsigned short usVal)
 {
     float fVal = ((float)(sPR2 + 1) * (float)usVal)/ (TMR_TIME * 1000000);
     OC4RS = (unsigned short)fVal; 
