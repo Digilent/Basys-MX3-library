@@ -65,7 +65,7 @@ void __ISR(_TIMER_5_VECTOR, ipl2) Timer5ISR(void)
 }
 
 // Timer period in seconds
-#define TMR_TIME    0.0003 // 300 us for each tick
+#define TMR_TIME    0.003 // 300 us for each tick
 
 /* ------------------------------------------------------------ */
 /***	Timer5Setup
