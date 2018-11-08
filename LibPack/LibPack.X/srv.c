@@ -208,8 +208,8 @@ int SRV_GetPulse(int fPinPmod, int fPin){
             break;
     }
     dc = (dutyScale * tHigh) / tCycle;        // Calculate duty cycle
-    return dc;
     T3CONbits.ON = 0;        // turn off Timer3
+    return dc;
 }
 
 
