@@ -50,17 +50,17 @@ unsigned short rgSinSamples[160];
 **
 **	Description:
 **		This is the interrupt handler for Timer3.
-        Advance current index in the sine definition buffer, initialize OC1 with 
+        Advance current index in the sine definition buffer, initialize OC1 with
  *      the current sine definition value.
-**          
+**
 */
-void __ISR(_TIMER_3_VECTOR, IPL7AUTO) Timer3ISR(void) 
-{      
-    
+void __ISR(_TIMER_3_VECTOR, IPL7AUTO) Timer3ISR(void)
+{
+
     // play sine
-    // load sine value into OC register
+    // load sine value into OC1 register
     OC1RS = 4*rgSinSamples[(++idxAudioBuf) % RGSIN_SIZE];
-    
+
     IFS0bits.T3IF = 0;      // clear Timer3 interrupt flag
 }
 
@@ -71,7 +71,7 @@ void __ISR(_TIMER_3_VECTOR, IPL7AUTO) Timer3ISR(void)
 **	Parameters:
 **
 **	Return Value:
-**		
+**
 **	Description:
 **		This function initializes the TONE module
 **      The output pin corresponding to TONE module (same as the AUDIO, A_OUT)
@@ -84,10 +84,10 @@ void __ISR(_TIMER_3_VECTOR, IPL7AUTO) Timer3ISR(void)
  *      Timer3's interrupt is enabled with a priority of 7, and sub priority of 3
 */
 void TONE_Init()
-{      
+{
     if(initRun == 0){
-        TONE_ConfigurePins(); 
-        PR3 = (int)((float)((float)PB_FRQ/TMR_FREQ_SINE) + 0.5); 
+        TONE_ConfigurePins();
+        PR3 = (int)((float)((float)PB_FRQ/TMR_FREQ_SINE) + 0.5);
 
         TMR3 = 0;
         T3CONbits.TCKPS = 0;     //1:1 pre scale value
@@ -98,11 +98,11 @@ void TONE_Init()
         OC1CONbits.ON = 0;       // Turn off OC1 while doing setup.
         OC1CONbits.OCM = 6;      // PWM mode on OC1; Fault pin is disabled
         OC1CONbits.OCTSEL = 1;   // Timer3 is the clock source for this Output Compare module
-        OC1CONbits.ON = 0;       // Start the OC1 module  
+        OC1CONbits.ON = 0;       // Start the OC1 module
 
         IPC3bits.T3IP = 7;      // interrupt priority
         IPC3bits.T3IS = 3;      // interrupt sub priority
-        IEC0bits.T3IE = 1;      // enable Timer3 interrupt    
+        IEC0bits.T3IE = 1;      // enable Timer3 interrupt
         IFS0bits.T3IF = 0;      // clear Timer3 interrupt flag
 
         macro_enable_interrupts();  // enable interrupts at CPU
@@ -116,17 +116,17 @@ void TONE_Init()
 **	Parameters:
 **
 **	Return Value:
-**		
+**
 **	Description:
-**		This function configures the output pin corresponding to TONE module (A_OUT) 
+**		This function configures the output pin corresponding to TONE module (A_OUT)
 **      as digital output and maps it to OC1.
 **      The function uses pin related definitions from config.h file.
-**      This is a low-level function called by TONE_Init(), so user should avoid calling it directly.           
+**      This is a low-level function called by TONE_Init(), so user should avoid calling it directly.
 */
 void TONE_ConfigurePins()
 {
     // Configure AUDIO output as digital output.
-    tris_A_OUT = 0;    
+    tris_A_OUT = 0;
     rp_A_OUT = 0x0C; // 1100 = OC1
     // disable analog (set pins as digital)
     ansel_A_OUT = 0;
@@ -136,23 +136,24 @@ void TONE_ConfigurePins()
 /***	TONE_Start
 **
 **	Parameters:
-**      int frequency - the frequency in Hz to be played by the speaker. 
- *      int ms - the number of milliseconds to play the sound for. 
- * 
+**      int frequency - the frequency in Hz to be played by the speaker.
+ *      int ms - the number of milliseconds to play the sound for.
+ *
 **	Return Value:
-**		
+**
 **	Description:
 **		This function plays a frequency on the speaker.
 **      The frequency is limited to 300-6000Hz because the speaker sounds terrible outside this
  *      range. If using the line out, this can be removed, and the samples array
  *      can be expanded to accommodate lower frequencies.
-**      Providing an ms of -1 will play the tone indefinitely until TONE_Close() is called.         
+**      Providing an ms of -1 will play the tone indefinitely until TONE_Close() is called.
 */
 void TONE_Start(int frequency, int ms){
     if(initRun == 0){ // check if init has been run yet
         TONE_Init();
     }
     TONE_Close();
+    //Frequency caps could be removed if using the line out instead
     if(frequency > 6000){ //keep frequency from sounding terrible through on board speaker
         frequency = 6000;
     }
@@ -167,10 +168,10 @@ void TONE_Start(int frequency, int ms){
         //The Timer3 ISR scales up by 4 to increase amplitude
         rgSinSamples[j] = (unsigned short)(256 * sinf(2.0f * M_PI * (float)j / RGSIN_SIZE)+257);
     }
-    
+
     T3CONbits.ON = 1;       // turn on Timer3
     OC1CONbits.ON = 1;      // Turn on OC1
-    
+
     int counter = 0;
     for (; counter < ms; counter++){
         int i = 0;
@@ -184,18 +185,18 @@ void TONE_Start(int frequency, int ms){
 /***	TONE_Close
 **
 **	Parameters:
-** 
+**
 **	Return Value:
-**      
+**
 **	Description:
-**		This functions releases the hardware involved in TONE library: 
-**      it turns off the Timer3 and OC1 modules.        
+**		This functions releases the hardware involved in TONE library:
+**      it turns off the Timer3 and OC1 modules.
 */
 void TONE_Close()
 {
         T3CONbits.ON = 0;       // turn off Timer3
         OC1CONbits.ON = 0;      // Turn off OC1
-        
+
 }
 /* *****************************************************************************
  End of File
