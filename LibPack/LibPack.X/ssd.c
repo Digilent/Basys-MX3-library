@@ -138,7 +138,7 @@ void __ISR(_TIMER_1_VECTOR, ipl7) Timer1ISR(void)
 */
 void SSD_Timer1Setup()
 {
-  PR1 = (int)(((float)(TMR_TIME * PB_FRQ) / 256) + 0.5); //set period register, generates one interrupt every 3 ms
+  PR1 = (int)(((float)(TMR_TIME * PB_FRQ) / 64) + 0.5); //set period register, generates one interrupt every 3 ms
   TMR1 = 0;                           //    initialize count to 0
   T1CONbits.TCKPS = 2;                //    1:64 prescale value
   T1CONbits.TGATE = 0;                //    not gated input (the default)

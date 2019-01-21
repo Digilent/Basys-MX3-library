@@ -9,14 +9,14 @@
 
   @Description
         This file groups the functions that implement the ACL library.
-        The library implements basic functions to configure the accelerometer 
+        The library implements basic functions to configure the accelerometer
         and read the accelerometer values (raw values and g values).
         The library uses I2C functions provided by I2C library.
-        Include the file as well as i2c.c, i2c.h and config.h in the project 
+        Include the file as well as i2c.c, i2c.h and config.h in the project
         when this library is needed.
- 
+
   @Author
-    Cristian Fatu 
+    Cristian Fatu
     cristian.fatu@digilent.ro
 */
 /* ************************************************************************** */
@@ -39,17 +39,17 @@ float fGRangeLSB;   // global variable used to pre-compute the value in g corres
 /***	ACL_Init
 **
 **	Parameters:
-**		
+**
 **
 **	Return Value:
-**		
+**
 **
 **	Description:
-**		This function initializes the hardware involved in the ACL module: 
-**      the I2C1 module of PIC32 is configured to work at 400 khz, 
-**      the ACL is initialized at ±2g full scale range and 
+**		This function initializes the hardware involved in the ACL module:
+**      the I2C1 module of PIC32 is configured to work at 400 khz,
+**      the ACL is initialized at +/-2g full scale range and
 **      the ACL_INT2 pin is configured as digital input.
-**          
+**
 */
 void ACL_Init()
 {
@@ -63,17 +63,17 @@ void ACL_Init()
 /***	ACL_ConfigurePins
 **
 **	Parameters:
-**		
+**
 **
 **	Return Value:
-**		
+**
 **
 **	Description:
-**		This function configures the digital pins involved in the ACL module: 
+**		This function configures the digital pins involved in the ACL module:
 **      the ACL_INT2 pin is configured as digital input.
 **      The function uses pin related definitions from config.h file.
 **      This is a low-level function called by ACL_Init(), so user should avoid calling it directly.
-**          
+**
 */
 void ACL_ConfigurePins()
 {
@@ -98,16 +98,16 @@ void ACL_ConfigurePins()
 **
 **	Description:
 **		This function writes the specified value to the register specified by its address.
-**      It returns the status of the operation: success or I2C errors (the slave address 
+**      It returns the status of the operation: success or I2C errors (the slave address
 **      was not acknowledged by the device or timeout error).
-**          
+**
 */
 unsigned char ACL_SetRegister(unsigned char bAddress, unsigned char bValue)
 {
     unsigned char rgVals[2], bResult;
     rgVals[0] = bAddress;       // register address
     rgVals[1] = bValue;         // register value
-    
+
     bResult = I2C_Write(ACL_I2C_ADDR, rgVals, 2, 1);
 
     return bResult;
@@ -123,9 +123,9 @@ unsigned char ACL_SetRegister(unsigned char bAddress, unsigned char bValue)
 **      unsigned char   - The register value
 **
 **	Description:
-**		This function returns the value of the register specified by its address. 
-**      
-**          
+**		This function returns the value of the register specified by its address.
+**
+**
 */
 unsigned char ACL_GetRegister(unsigned char bAddress)
 {
@@ -148,11 +148,11 @@ unsigned char ACL_GetRegister(unsigned char bAddress)
 **                      0xFE        timeout error
 **
 **	Description:
-**		This function returns the device ID. It obtains it by reading 
+**		This function returns the device ID. It obtains it by reading
 **          "0x0D: WHO_AM_I Device ID" register.
-**      If errors occur, it returns the I2C error 
+**      If errors occur, it returns the I2C error
 **     (the slave address was not acknowledged by the device or timeout error)
-**          
+**
 */
 unsigned char ACL_GetDeviceID()
 {
@@ -175,26 +175,33 @@ unsigned char ACL_GetDeviceID()
 **                      0xFE        timeout error
 **
 **	Description:
-**		This function sets the full scale range. It sets the according bits in the 
-**      0x0E: XYZ_DATA_CFG register. The function also pre-computes the fGRangeLSB 
+**		This function sets the full scale range. It sets the according bits in the
+**      0x0E: XYZ_DATA_CFG register. The function also pre-computes the fGRangeLSB
 **      to be used when converting raw values to g values.
-**      It returns the status of the operation: success or I2C errors (the slave address 
+**      It returns the status of the operation: success or I2C errors (the slave address
 **      was not acknowledged by the device or timeout error).
  */
 unsigned char ACL_SetRange(unsigned char bRange)
 {
     unsigned char bResult, bVal;
-    bRange &= 3;    // only 2 least significant bits from bRange are used
 
-    
+    //Set accelerometer to standby mode
+    ACL_SetRegister(ACL_CTRL_REG1, (ACL_GetRegister(ACL_CTRL_REG1) & 0xFE));
+
+    //Change accelerometer Dynamic Range
     bVal = ACL_GetRegister(ACL_XYZDATACFG); // get old value of the register
-    bVal &= 0xFC;   // mask out the 2 LSBs
-    bVal |= bRange; // set the 2 LSBs according to the range value
+    bVal &= 0xFC; // mask out the 2 LSBs
+    bVal |= bRange;  // set the 2 LSBs according to the range value
     bResult = ACL_SetRegister(ACL_XYZDATACFG, bVal);
 
     // set fGRangeLSB according to the selected range
+    bRange &= 3;
     unsigned char bValRange = 1<<(bRange + 2);
     fGRangeLSB = ((float)bValRange)/(1<<12);     // the range is divided to the resolution corresponding to number of bits (12)
+
+    //Set accelerometer back to active mode
+    ACL_SetRegister(ACL_CTRL_REG1, (ACL_GetRegister(ACL_CTRL_REG1) | 0x01));
+
     return bResult;
 }
 
@@ -202,7 +209,7 @@ unsigned char ACL_SetRange(unsigned char bRange)
 /***	ACL_ReadRawValues
 **
 **	Parameters:
-**      unsigned char *rgRawVals     - Pointer to a buffer where the received bytes will be placed. 
+**      unsigned char *rgRawVals     - Pointer to a buffer where the received bytes will be placed.
 **      It will contain the 6 bytes, one pair for each of to the 3 axes:
 **                      rgRawVals[0]   - MSB of X reading (X11 X10 X9 X8 X7 X6 X5 X4)
 **                      rgRawVals[1]   - LSB of X reading ( X3  X2 X1 X0  0  0  0  0)
@@ -210,23 +217,23 @@ unsigned char ACL_SetRange(unsigned char bRange)
 **                      rgRawVals[3]   - LSB of Y reading ( Y3  Y2 Y1 Y0  0  0  0  0)
 **                      rgRawVals[4]   - MSB of Z reading (Z11 Z10 Z9 Z8 Z7 Z6 Z5 Z4)
 **                      rgRawVals[5]   - LSB of Z reading ( Z3  Z2 Z1 Z0  0  0  0  0)
-**                                      In the above table, the raw value for each axis is a 12 bits value: 
+**                                      In the above table, the raw value for each axis is a 12 bits value:
 **                                      X11-X0, Y11-Y0, Z11-Z0, the 0 bit being the LSB bit.
 **
 **	Return Value:
 **
 **	Description:
-**		This function reads the module raw values for the three axes. 
+**		This function reads the module raw values for the three axes.
 **      Each raw value is represented on 12 bits, so it will be represented on 2 bytes:
-**      The MSB byte contains the 8 MSB bits, while the LSB byte contains the 4 LSB bits, 
+**      The MSB byte contains the 8 MSB bits, while the LSB byte contains the 4 LSB bits,
 **      padded right with 4 bits of 0.
 **      The raw values are obtained by reading the 6 consecutive registers starting with "0x01: OUT_X_MSB"
-**      
+**
 */
 void ACL_ReadRawValues(unsigned char *rgRawVals)
 {
     unsigned char bVal = ACL_OUT_X_MSB;
-    
+
     I2C_Write(ACL_I2C_ADDR, &bVal, 1, 0);
     I2C_Read(ACL_I2C_ADDR, rgRawVals, 6);
 }
@@ -235,7 +242,7 @@ void ACL_ReadRawValues(unsigned char *rgRawVals)
 /***	ACL_ConvertRawToValueG
 **
 **	Parameters:
-**      unsigned char *rgRawVals     - Pointer to a buffer that contains the 2 bytes corresponding to the raw value. 
+**      unsigned char *rgRawVals     - Pointer to a buffer that contains the 2 bytes corresponding to the raw value.
 **                      rgRawVals[0]   - MSB of raw value (V11 V10 V9 V8 V7 V6 V5 V4)
 **                      rgRawVals[1]   - LSB of raw value ( V3  V2 V1 V0  0  0  0  0)
 **                                      In the above table, the raw value is a 12 bits value: V11-V0, the 0 bit being the LSB bit
@@ -246,19 +253,19 @@ void ACL_ReadRawValues(unsigned char *rgRawVals)
 **
 **	Description:
 **		This function returns the acceleration value in terms of g, computed from
-**      the 2 bytes acceleration raw values (2's complement on 12 bites) 
+**      the 2 bytes acceleration raw values (2's complement on 12 bites)
 **      Each raw value is represented on 12 bits so it will be represented on 2 bytes:
-**      The MSB byte contains the 8 MSB bits of the raw value, while the LSB byte contains the 
+**      The MSB byte contains the 8 MSB bits of the raw value, while the LSB byte contains the
 **      4 LSB bits of the raw value padded right with 4 bits of 0.
 **      Computing the acceleration in terms of g is done with this formula:
-**      (<full scale range> / 2^12)*<raw value>. The (<full scale range> / 2^12) term is 
+**      (<full scale range> / 2^12)*<raw value>. The (<full scale range> / 2^12) term is
 **      pre-computed every time the range is set, using global variable fGRangeLSB.
 **      This function involves float values computing, so avoid using it intensively when performance is an issue.
-**      
+**
 */
 float ACL_ConvertRawToValueG(unsigned char *rgRawVals)
 {
-    // Convert the accelerometer value to G's. 
+    // Convert the accelerometer value to G's.
     // With 12 bits measuring over a +/- ng range we can find how to convert by using the equation:
     // Gs = Measurement Value * (G-range/(2^12))
 
@@ -279,9 +286,9 @@ float ACL_ConvertRawToValueG(unsigned char *rgRawVals)
 **	Parameters:
 **      float *rgGVals     - Pointer to a buffer where the acceleration values in terms of g will be placed.
 **                          It will contain the 3 float values, one for each of to the 3 axes:
-**                              0 - Acceleration on X axis (in terms of g) 
-**                              1 - Acceleration on Y axis (in terms of g) 
-**                              2 - Acceleration on Z axis (in terms of g) 
+**                              0 - Acceleration on X axis (in terms of g)
+**                              1 - Acceleration on Y axis (in terms of g)
+**                              2 - Acceleration on Z axis (in terms of g)
 **
 **
 **	Return Value:
@@ -291,7 +298,7 @@ float ACL_ConvertRawToValueG(unsigned char *rgRawVals)
 **      The raw values are acquired using ACL_ReadRawValues. Then, for each axis, the 2 bytes
 **      are converted to a float value in terms of in g.
 **      This function involves float values computing, so avoid using it intensively when performance is an issue.
-**      
+**
 */
 void ACL_ReadGValues(float *rgGVals)
 {
@@ -307,20 +314,20 @@ void ACL_ReadGValues(float *rgGVals)
 /***	ACL_Close
 **
 **	Parameters:
-** 
+**
 **
 **	Return Value:
-**      
+**
 **
 **	Description:
-**		This functions releases the hardware involved in the ACL library: 
+**		This functions releases the hardware involved in the ACL library:
 **      it closes the I2C1 interface.
-**      
-**          
+**
+**
 */
 void ACL_Close()
 {
-    I2C1CONbits.ON = 0;     //Disable the I2C module 
+    I2C1CONbits.ON = 0;     //Disable the I2C module
 }
 
 /* *****************************************************************************
